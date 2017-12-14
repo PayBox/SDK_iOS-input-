@@ -84,7 +84,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "http://arman88@gitlab.local/arman88/paybox_sdk_ios.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/PayBox/SDK_iOS-input-.git", :tag => "#{s.version}" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
