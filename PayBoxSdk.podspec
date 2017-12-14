@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "PayBoxSdk"
-  s.version      = "1.0.0"
+  s.version      = "Master"
   s.summary      = "PayBoxSdk"
 
   # This description is used to generate tags and improve search results.
