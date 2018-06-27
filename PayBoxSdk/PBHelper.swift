@@ -143,29 +143,29 @@ open class PBHelper : PBConnection {
         params.append((key: Constants.PB_SIG, value: sig))
         showWebView(url: parser.urlGet(from: params, mainUrl: Constants.PB_CARDPAY_MERCHANT(merchantId: PBHelper.configuration.MERCHANT_ID).appending(Constants.PB_CARDPAY)), operation: .CARDPAY)
     }
-    public func initCardPayment(amount: Int, userId: Int, cardId: Int, orderId: String, description: String){
+    public func initCardPayment(amount: Int, userId: String, cardId: Int, orderId: String, description: String){
         var params : [String:String] = defParameters
-        params.updateValue(String(userId), forKey: Constants.PB_USER_ID)
+        params.updateValue(userId, forKey: Constants.PB_USER_ID)
         params.updateValue(String(cardId), forKey: Constants.PB_CARD_ID)
         params.updateValue(String(orderId), forKey: Constants.PB_ORDER_ID)
         params.updateValue(String(amount), forKey: Constants.PB_AMOUNT)
         params.updateValue(description, forKey: Constants.PB_DESCRIPTION)
         initial(operation: .CARDINITPAY, params: params)
     }
-    public func removeCard(userId: Int, cardId: Int){
+    public func removeCard(userId: String, cardId: Int){
         var params : [String:String] = defParameters
-        params.updateValue(String(userId), forKey: Constants.PB_USER_ID)
+        params.updateValue(userId, forKey: Constants.PB_USER_ID)
         params.updateValue(String(cardId), forKey: Constants.PB_CARD_ID)
         initial(operation: .CARDREMOVE, params: params)
     }
-    public func getCards(userId: Int) {
+    public func getCards(userId: String) {
         var params: [String:String] = defParameters
-        params.updateValue(String(userId), forKey: Constants.PB_USER_ID)
+        params.updateValue(userId, forKey: Constants.PB_USER_ID)
         initial(operation: .CARDLIST, params: params)
     }
-    public func addCard(userId: Int, postUrl: String) {
+    public func addCard(userId: String, postUrl: String) {
         var params: [String:String] = defParameters
-        params.updateValue(String(userId), forKey: Constants.PB_USER_ID)
+        params.updateValue(userId, forKey: Constants.PB_USER_ID)
         params.updateValue(postUrl, forKey: Constants.PB_POST_URL)
         params.updateValue(Constants.SUCCESS, forKey: Constants.PB_BACK_URL)
         initial(operation: .CARDADD, params: params)
@@ -198,9 +198,9 @@ open class PBHelper : PBConnection {
         params.updateValue(String(paymentId), forKey: Constants.PB_PAYMENT_ID)
         initial(operation: .CAPTURE, params: params)
     }
-    public func initPayment(orderId: String?, userId: Int, amount: Int, description: String){
+    public func initPayment(orderId: String?, userId: String, amount: Int, description: String){
         var params = PBHelper.configuration.toArray
-        params.updateValue(String(userId), forKey: Constants.PB_USER_ID)
+        params.updateValue(userId, forKey: Constants.PB_USER_ID)
         params.updateValue(String(amount), forKey: Constants.PB_AMOUNT)
         params.updateValue(description, forKey: Constants.PB_DESCRIPTION)
         if orderId != nil {
