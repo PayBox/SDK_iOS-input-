@@ -25,7 +25,7 @@ PayBox SDK - это библиотека позволяющая упростит
         platform :ios, '10.0';
         use_frameworks!
         target 'Project name' do
-        pod 'PayBoxSdk', :git ='https://github.com/PayBox/SDK_iOS-input-.git', :submodules=true
+        pod 'PayBoxSdk', :git => 'https://github.com/PayBox/SDK_iOS-input-.git', :submodules => true
         end
 1. Затем выполните след. команду:
         
