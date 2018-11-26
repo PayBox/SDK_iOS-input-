@@ -60,15 +60,15 @@ struct PBConfiguration{
         }
         array.updateValue(PAYMENT_SYSTEM, forKey: Constants.PB_PAYMENT_SYSTEM)
         array.updateValue(CURRENCY, forKey: Constants.PB_CURRENCY)
-        array.updateValue(String(isTEST.hashValue), forKey: Constants.PB_TESTING_MODE)
+        array.updateValue(String(isTEST  ?1:0), forKey: Constants.PB_TESTING_MODE)
         array.updateValue(REQUEST_METHOD, forKey: Constants.PB_REQUEST_METHOD)
         array.updateValue(String(RECURRING_LIFETIME), forKey: Constants.PB_RECURRING_LIFETIME)
-        array.updateValue(String(isRECURRING.hashValue), forKey: Constants.PB_RECURRING_START)
+        array.updateValue(String(isRECURRING ?1:0), forKey: Constants.PB_RECURRING_START)
         array.updateValue(SUCCESS, forKey: Constants.PB_SUCCESS_URL)
         array.updateValue(FAILURE, forKey: Constants.PB_FAILURE_URL)
         array.updateValue("GET", forKey: Constants.PB_FAILURE_METHOD)
         array.updateValue("GET", forKey: Constants.PB_SUCCESS_METHOD)
-        array.updateValue(String(AUTO_CLEARING.hashValue), forKey: Constants.PB_AUTO_CLEARING)
+        array.updateValue(String(AUTO_CLEARING  ?1:0), forKey: Constants.PB_AUTO_CLEARING)
         if let user_email = USER_EMAIL {
             array.updateValue(user_email, forKey: Constants.PB_CONTACT_EMAIl)
         }
