@@ -109,7 +109,7 @@ PayBox SDK - это библиотека позволяющая упростит
 
 **Для проведения рекуррентного платежа добавленной картой:**
 
-PBHelper.sdk.makeRecurring(amount: Float, recurringProfile: String, description: String, extraParams: [String: String]?)
+        PBHelper.sdk.makeRecurring(amount: Float, recurringProfile: String, description: String, extraParams: [String: String]?)
 
 После успешной операции вызовется метод:
 
