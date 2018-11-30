@@ -85,7 +85,7 @@ PayBox SDK - это библиотека позволяющая упростит
 
 **Для инициализации платежа** (при инициализации с параметром &quot;builder.enableRecurring(int)&quot;, карты сохраняются в системе PayBox):
 
-        PBHelper.sdk.initPayment(orderId: String, userId: Int, amount: Int, description: String)
+        PBHelper.sdk.initPayment(orderId: String, userId: Int, amount: Float, description: String, extraParams: [String: String]?)
 
 В ответ откроется &quot;webView&quot; для заполнения карточных данных, после успешной оплаты вызовется функция:
 
@@ -101,7 +101,7 @@ PayBox SDK - это библиотека позволяющая упростит
 
 **Для проведения возврата платежа, по которому прошел клиринг:**
 
-        PBHelper.sdk.initRevokePayment(paymentId: Int, amount: Int)
+        PBHelper.sdk.initRevokePayment(paymentId: Int, amount: Float)
 
 После успешной операции вызовется метод:
 
@@ -109,7 +109,7 @@ PayBox SDK - это библиотека позволяющая упростит
 
 **Для проведения рекуррентного платежа добавленной картой:**
 
-PBHelper.sdk.makeRecurring(amount: Int, recurringProfile: String, description: String)
+PBHelper.sdk.makeRecurring(amount: Float, recurringProfile: String, description: String, extraParams: [String: String]?)
 
 После успешной операции вызовется метод:
 
@@ -157,7 +157,7 @@ PBHelper.sdk.makeRecurring(amount: Int, recurringProfile: String, description: S
 
 **Для создания платежа добавленной картой:**
 
-        PBHelper.sdk.initCardPayment(amount: Int, userId: Int, cardId: Int, orderId: String, description: String)
+        PBHelper.sdk.initCardPayment(amount: Float, userId: Int, cardId: Int, orderId: String, description: String, extraParams: [String: String]?)
 
 После успешной операции вызовется метод:
 

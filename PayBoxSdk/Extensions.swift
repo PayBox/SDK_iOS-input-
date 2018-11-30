@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import commonCrypto
+import CommonCrypto
 
 extension String {
     func md5() -> String! {

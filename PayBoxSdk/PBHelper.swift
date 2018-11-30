@@ -78,7 +78,14 @@ open class PBHelper : PBConnection {
             break
         case .RECURRING:
             if isOkFrom(xml: response) {
-                PBHelper.callBackDelegate?.onRecurringPaid(recurringResponse: Recurring(status: parser.stringFrom(xml: response, name: Constants.PB_STATUS), paymentId: parser.stringFrom(xml: response, name: Constants.PB_PAYMENT_ID), recurringProfile: parser.stringFrom(xml: response, name: Constants.PB_RECURRING_PROFILE), recurringExpireDate: parser.stringFrom(xml: response, name: Constants.PB_RECURRING_EXPIRE_DATE), currency: parser.stringFrom(xml: response, name: Constants.PB_CURRENCY), amount: Int(parser.stringFrom(xml: response, name: Constants.PB_AMOUNT))!))
+                PBHelper.callBackDelegate?.onRecurringPaid(recurringResponse:
+                    Recurring(status:
+                        parser.stringFrom(xml: response, name: Constants.PB_STATUS),
+                        paymentId: parser.stringFrom(xml: response, name: Constants.PB_PAYMENT_ID),
+                        recurringProfile: parser.stringFrom(xml: response, name: Constants.PB_RECURRING_PROFILE),
+                        recurringExpireDate: parser.stringFrom(xml: response, name: Constants.PB_RECURRING_EXPIRE_DATE),
+                        currency: parser.stringFrom(xml: response, name: Constants.PB_CURRENCY),
+                        amount: Float(parser.stringFrom(xml: response, name: Constants.PB_AMOUNT))!))
             }
             break
         case .REVOKE:
@@ -143,8 +150,11 @@ open class PBHelper : PBConnection {
         params.append((key: Constants.PB_SIG, value: sig))
         showWebView(url: parser.urlGet(from: params, mainUrl: Constants.PB_CARDPAY_MERCHANT(merchantId: PBHelper.configuration.MERCHANT_ID).appending(Constants.PB_CARDPAY)), operation: .CARDPAY)
     }
-    public func initCardPayment(amount: Int, userId: String, cardId: Int, orderId: String, description: String){
+    public func initCardPayment(amount: Float, userId: String, cardId: Int, orderId: String, description: String, extraParams: [String:String]?){
         var params : [String:String] = defParameters
+        if extraParams != nil {
+            params = params.merging(extraParams!, uniquingKeysWith: {(first, _) in first})
+        }
         params.updateValue(userId, forKey: Constants.PB_USER_ID)
         params.updateValue(String(cardId), forKey: Constants.PB_CARD_ID)
         params.updateValue(String(orderId), forKey: Constants.PB_ORDER_ID)
@@ -170,11 +180,14 @@ open class PBHelper : PBConnection {
         params.updateValue(Constants.SUCCESS, forKey: Constants.PB_BACK_URL)
         initial(operation: .CARDADD, params: params)
     }
-    public func makeRecurring(amount: Int, recurringProfile: String, description: String){
+    public func makeRecurring(amount: Float, recurringProfile: String, description: String, extraParams: [String:String]?){
         var params: [String:String] = PBHelper.configuration.toArray
         params.updateValue(String(amount), forKey: Constants.PB_AMOUNT)
         params.updateValue(recurringProfile, forKey: Constants.PB_RECURRING_PROFILE)
         params.updateValue(description, forKey: Constants.PB_DESCRIPTION)
+        if extraParams != nil {
+            params = params.merging(extraParams!, uniquingKeysWith: {(first, _) in first})
+        }
         initial(operation: .RECURRING, params: params)
     }
     public func initCancelPayment(paymentId: Int){
@@ -187,7 +200,7 @@ open class PBHelper : PBConnection {
         params.updateValue(String(paymentId), forKey: Constants.PB_PAYMENT_ID)
         initial(operation: .GETSTATUS, params: params)
     }
-    public func initRevokePayment(paymentId: Int, amount: Int){
+    public func initRevokePayment(paymentId: Int, amount: Float){
         var params: [String:String] = defParameters
         params.updateValue(String(paymentId), forKey: Constants.PB_PAYMENT_ID)
         params.updateValue(String(amount), forKey: Constants.PB_REFUND_AMOUNT)
@@ -198,11 +211,14 @@ open class PBHelper : PBConnection {
         params.updateValue(String(paymentId), forKey: Constants.PB_PAYMENT_ID)
         initial(operation: .CAPTURE, params: params)
     }
-    public func initPayment(orderId: String?, userId: String, amount: Int, description: String){
+    public func initPayment(orderId: String?, userId: String, amount: Float, description: String, extraParams: [String:String]?){
         var params = PBHelper.configuration.toArray
         params.updateValue(userId, forKey: Constants.PB_USER_ID)
         params.updateValue(String(amount), forKey: Constants.PB_AMOUNT)
         params.updateValue(description, forKey: Constants.PB_DESCRIPTION)
+        if extraParams != nil {
+            params = params.merging(extraParams!, uniquingKeysWith: {(first, _) in first})
+        }
         if orderId != nil {
             params.updateValue(orderId!, forKey: Constants.PB_ORDER_ID)
         }

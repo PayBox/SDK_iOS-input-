@@ -55,10 +55,10 @@ open class Recurring : Response {
     public var recurringProfile: String
     public var recurringExpireDate: Date?
     public var currency: String
-    public var amount: Int
+    public var amount: Float
     
     public init(status: String, paymentId: String, recurringProfile: String,
-                recurringExpireDate: String, currency: String, amount: Int) {
+                recurringExpireDate: String, currency: String, amount: Float) {
         self.recurringProfile = recurringProfile
         self.recurringExpireDate = ParseHelper.parser.parseToDate(date: recurringExpireDate)
         self.currency = currency
