@@ -4,7 +4,7 @@ Pod::Spec.new do |s|
  
 
   s.name         = "PayBoxSdk"
-  s.version      = "1.0.2"
+  s.version      = "1.0.3"
   s.summary      = "PayBoxSdk"
   s.description  = "test"
   s.homepage     = "http://paybox.money"

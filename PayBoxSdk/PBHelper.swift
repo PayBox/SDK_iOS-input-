@@ -25,10 +25,9 @@ open class PBHelper : PBConnection {
         case CARDPAY
     }
     private let parser = ParseHelper.parser
-    private static var viewController : UIViewController?
     private var responseXml: String?
     private static var sharedInstance : PBHelper?
-    private static var callBackDelegate : PBDelegate?
+    private var callBackDelegate : PBDelegate?
     public static var sdk: PBHelper{
         if sharedInstance==nil {
             fatalError("Please init Builder")
@@ -38,7 +37,7 @@ open class PBHelper : PBConnection {
     
     
     func onErrorResponse(response: [Int : String]) {
-        PBHelper.callBackDelegate?.onError(error: ErrorResponse(errorCode: (response.first?.key)!, errorDescription: (response.first?.value)!))
+        self.callBackDelegate?.onError(error: ErrorResponse(errorCode: (response.first?.key)!, errorDescription: (response.first?.value)!))
     }
     
     func onSuccessConnection(command: PBHelper.OPERATION, response: String) {
@@ -53,12 +52,12 @@ open class PBHelper : PBConnection {
         case .CARDINITPAY:
             if isOkFrom(xml: response) {
                 responseXml = response
-                PBHelper.callBackDelegate?.onCardPayInited(response: getResponse(response: response))
+                self.callBackDelegate?.onCardPayInited(response: getResponse(response: response))
             }
             break
         case .GETSTATUS:
             if isOkFrom(xml: response) {
-                PBHelper.callBackDelegate?.onPaymentStatus(status: PStatus(status: parser.stringFrom(xml: response, name: Constants.PB_STATUS), paymentId: parser.stringFrom(xml: response, name: Constants.PB_PAYMENT_ID), transactionStatus: parser.stringFrom(xml: response, name: Constants.PB_TRANSACTION_STATUS), canReject: Int(parser.stringFrom(xml: response, name: Constants.PB_CAN_REJECT)) == 1 ? true : false, isCaptured: Int(parser.stringFrom(xml: response, name: Constants.PB_CAPTURED)) == 1 ? true : false, paymentSystem: parser.stringFrom(xml: response, name: Constants.PB_PAYMENT_SYSTEM), createDate: parser.stringFrom(xml: response, name: Constants.PB_CREATE_DATE), cardPan: parser.stringFrom(xml: response, name: Constants.PB_CARD_PAN)))
+                self.callBackDelegate?.onPaymentStatus(status: PStatus(status: parser.stringFrom(xml: response, name: Constants.PB_STATUS), paymentId: parser.stringFrom(xml: response, name: Constants.PB_PAYMENT_ID), transactionStatus: parser.stringFrom(xml: response, name: Constants.PB_TRANSACTION_STATUS), canReject: Int(parser.stringFrom(xml: response, name: Constants.PB_CAN_REJECT)) == 1 ? true : false, isCaptured: Int(parser.stringFrom(xml: response, name: Constants.PB_CAPTURED)) == 1 ? true : false, paymentSystem: parser.stringFrom(xml: response, name: Constants.PB_PAYMENT_SYSTEM), createDate: parser.stringFrom(xml: response, name: Constants.PB_CREATE_DATE), cardPan: parser.stringFrom(xml: response, name: Constants.PB_CARD_PAN)))
                 
             }
             break
@@ -70,15 +69,15 @@ open class PBHelper : PBConnection {
             }
             break
         case .CARDLIST:
-            PBHelper.callBackDelegate?.onCardListed(cards: parser.cardFrom(xml: response))
+            self.callBackDelegate?.onCardListed(cards: parser.cardFrom(xml: response))
             break
         case .CARDREMOVE:
-            PBHelper.callBackDelegate?.onCardRemoved(card: Card(status: parser.stringFrom(xml: response, name: Constants.PB_STATUS), merchantId: parser.stringFrom(xml: response, name: Constants.PB_MERCHANT_ID), cardId: parser.stringFrom(xml: response, name: Constants.PB_CARD_ID), recurringProfile: parser.stringFrom(xml: response, name: Constants.PB_RECURRING_PROFILE), cardHash: parser.stringFrom(xml: response, name: Constants.PB_CARD_HASH),
+            self.callBackDelegate?.onCardRemoved(card: Card(status: parser.stringFrom(xml: response, name: Constants.PB_STATUS), merchantId: parser.stringFrom(xml: response, name: Constants.PB_MERCHANT_ID), cardId: parser.stringFrom(xml: response, name: Constants.PB_CARD_ID), recurringProfile: parser.stringFrom(xml: response, name: Constants.PB_RECURRING_PROFILE), cardHash: parser.stringFrom(xml: response, name: Constants.PB_CARD_HASH),
                                                                    date: parser.stringFrom(xml: response, name: Constants.PB_CARD_DELETED_AT)))
             break
         case .RECURRING:
             if isOkFrom(xml: response) {
-                PBHelper.callBackDelegate?.onRecurringPaid(recurringResponse:
+                self.callBackDelegate?.onRecurringPaid(recurringResponse:
                     Recurring(status:
                         parser.stringFrom(xml: response, name: Constants.PB_STATUS),
                         paymentId: parser.stringFrom(xml: response, name: Constants.PB_PAYMENT_ID),
@@ -90,17 +89,17 @@ open class PBHelper : PBConnection {
             break
         case .REVOKE:
             if isOkFrom(xml: response) {
-                PBHelper.callBackDelegate?.onPaymentRevoked(response: getResponse(response: response))
+                self.callBackDelegate?.onPaymentRevoked(response: getResponse(response: response))
             }
             break
         case .CANCEL:
             if isOkFrom(xml: response) {
-                PBHelper.callBackDelegate?.onPaymentCanceled(response: getResponse(response: response))
+                self.callBackDelegate?.onPaymentCanceled(response: getResponse(response: response))
             }
             break
         case .CAPTURE:
             if isOkFrom(xml: response) {
-                PBHelper.callBackDelegate?.onPaymentCaptured(capture: Capture(status: parser.stringFrom(xml: response, name: Constants.PB_STATUS), amount: parser.stringFrom(xml: response, name: Constants.PB_AMOUNT), clearingAmount: parser.stringFrom(xml: response, name: Constants.PB_CLEARING_AMOUNT)))
+                self.callBackDelegate?.onPaymentCaptured(capture: Capture(status: parser.stringFrom(xml: response, name: Constants.PB_STATUS), amount: parser.stringFrom(xml: response, name: Constants.PB_AMOUNT), clearingAmount: parser.stringFrom(xml: response, name: Constants.PB_CLEARING_AMOUNT)))
             }
             break
         default:
@@ -119,7 +118,7 @@ open class PBHelper : PBConnection {
                     if status[1].components(separatedBy: "</"+Constants.PB_STATUS+">")[0] != "error" ? true : false {
                         return true
                     } else {
-                        PBHelper.callBackDelegate?.onError(error: ErrorResponse(errorCode: Int(parser.stringFrom(xml: xml, name: Constants.PB_ERROR_CODE))!, errorDescription: parser.stringFrom(xml: xml, name: Constants.PB_ERROR_DESCRIPTION)))
+                        self.callBackDelegate?.onError(error: ErrorResponse(errorCode: Int(parser.stringFrom(xml: xml, name: Constants.PB_ERROR_CODE))!, errorDescription: parser.stringFrom(xml: xml, name: Constants.PB_ERROR_DESCRIPTION)))
                         return false
                     }
                 }
@@ -131,10 +130,7 @@ open class PBHelper : PBConnection {
     }
     private func showWebView(url: String, operation: PBHelper.OPERATION){
         let webView: WebController = WebController(url: url, helper: self, operation: operation)
-        guard let view = PBHelper.viewController else {
-            return
-        }
-        view.present(webView, animated: true, completion: nil)
+        UIApplication.shared.keyWindow?.rootViewController?.present(webView, animated: true, completion: nil)
     }
     public var defParameters: [String:String] {
         var params: [String:String] = [:]
@@ -224,29 +220,41 @@ open class PBHelper : PBConnection {
         }
         initial(operation: .PAYMENT, params: params)
     }
+    
+    open func enableRecurring(lifetime: Int) {
+        PBHelper.configuration.RECURRING_LIFETIME = lifetime
+        PBHelper.configuration.isRECURRING = true
+    }
+    open func disableRecurring() {
+        PBHelper.configuration.isRECURRING = false
+    }
+    open func pbDelegate(delegate: PBDelegate?) {
+        self.callBackDelegate = delegate
+    }
+    
     public func webSubmited(operation: OPERATION, isSuccess: Bool){
         if isSuccess {
             switch operation {
             case .PAYMENT:
                 if responseXml != nil {
-                    PBHelper.callBackDelegate?.onPaymentPaid(response: getResponse(response: responseXml!))
+                    self.callBackDelegate?.onPaymentPaid(response: getResponse(response: responseXml!))
                 }
                 break
             case .CARDADD:
                 if responseXml != nil {
-                    PBHelper.callBackDelegate?.onCardAdded(response: Response(status: parser.stringFrom(xml: responseXml!, name: Constants.PB_STATUS), paymentId: parser.stringFrom(xml: responseXml!, name: Constants.PB_PAYMENT_ID), redirectUri: parser.stringFrom(xml: responseXml!, name: Constants.PB_REDIRECT_URL)))
+                    self.callBackDelegate?.onCardAdded(response: Response(status: parser.stringFrom(xml: responseXml!, name: Constants.PB_STATUS), paymentId: parser.stringFrom(xml: responseXml!, name: Constants.PB_PAYMENT_ID), redirectUri: parser.stringFrom(xml: responseXml!, name: Constants.PB_REDIRECT_URL)))
                 }
                 break
             case .CARDPAY:
                 if responseXml != nil {
-                    PBHelper.callBackDelegate?.onCardPaid(response: Response(status: parser.stringFrom(xml: responseXml!, name: Constants.PB_STATUS), paymentId: parser.stringFrom(xml: responseXml!, name: Constants.PB_PAYMENT_ID), redirectUri: parser.stringFrom(xml: responseXml!, name: Constants.PB_REDIRECT_URL)))
+                    self.callBackDelegate?.onCardPaid(response: Response(status: parser.stringFrom(xml: responseXml!, name: Constants.PB_STATUS), paymentId: parser.stringFrom(xml: responseXml!, name: Constants.PB_PAYMENT_ID), redirectUri: parser.stringFrom(xml: responseXml!, name: Constants.PB_REDIRECT_URL)))
                 }
                 break
             default:
                 break
             }
         } else {
-            PBHelper.callBackDelegate?.onError(error: ErrorResponse(errorCode: 3, errorDescription: Constants.FAILURE_ERROR))
+            self.callBackDelegate?.onError(error: ErrorResponse(errorCode: 3, errorDescription: Constants.FAILURE_ERROR))
         }
     }
     private func initial(operation: OPERATION, params: [String:String]){
@@ -266,11 +274,7 @@ open class PBHelper : PBConnection {
             PBHelper.configuration = PBConfiguration(_secretKey: secretKey, _merchantId: merchantId)
             return self
         }
-        open func pbDelegate(delegate: UIViewController)->Builder{
-            PBHelper.callBackDelegate = delegate as? PBDelegate
-            PBHelper.viewController = delegate
-            return self
-        }
+        
         open func paymentLifeTime(lifetime: Int)->Builder{
             PBHelper.configuration.PAYMENT_LIFETIME = lifetime
             return self
@@ -308,15 +312,7 @@ open class PBHelper : PBConnection {
             PBHelper.configuration.REQUEST_METHOD = method.rawValue
             return self
         }
-        open func enableRecurring(lifetime: Int)->Builder{
-            PBHelper.configuration.RECURRING_LIFETIME = lifetime
-            PBHelper.configuration.isRECURRING = true
-            return self
-        }
-        open func disableRecurring()->Builder{
-            PBHelper.configuration.isRECURRING = false
-            return self
-        }
+        
         
         open func build()->PBHelper{
             if PBHelper.configuration != nil {
@@ -324,6 +320,7 @@ open class PBHelper : PBConnection {
                     PBHelper.sharedInstance = PBHelper()
                 }
             }
+             
             return PBHelper.sharedInstance!
         }
     }
