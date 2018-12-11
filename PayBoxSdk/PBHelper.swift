@@ -5,12 +5,12 @@
 //  Created by Arman Mergenbayev on 22.11.2017.
 //  Copyright © 2017 paybox. All rights reserved.
 //
-
 import Foundation
 
 open class PBHelper : PBConnection {
     
     private static var configuration: PBConfiguration!
+    private var currenctVC: UIViewController?
     public enum OPERATION {
         case PAYMENT
         case REVOKE
@@ -28,7 +28,7 @@ open class PBHelper : PBConnection {
     private var responseXml: String?
     private static var sharedInstance : PBHelper?
     private var callBackDelegate : PBDelegate?
-    public static var sdk: PBHelper{
+    public static var sdk: PBHelper {
         if sharedInstance==nil {
             fatalError("Please init Builder")
         }
@@ -73,18 +73,18 @@ open class PBHelper : PBConnection {
             break
         case .CARDREMOVE:
             self.callBackDelegate?.onCardRemoved(card: Card(status: parser.stringFrom(xml: response, name: Constants.PB_STATUS), merchantId: parser.stringFrom(xml: response, name: Constants.PB_MERCHANT_ID), cardId: parser.stringFrom(xml: response, name: Constants.PB_CARD_ID), recurringProfile: parser.stringFrom(xml: response, name: Constants.PB_RECURRING_PROFILE), cardHash: parser.stringFrom(xml: response, name: Constants.PB_CARD_HASH),
-                                                                   date: parser.stringFrom(xml: response, name: Constants.PB_CARD_DELETED_AT)))
+                                                            date: parser.stringFrom(xml: response, name: Constants.PB_CARD_DELETED_AT)))
             break
         case .RECURRING:
             if isOkFrom(xml: response) {
                 self.callBackDelegate?.onRecurringPaid(recurringResponse:
                     Recurring(status:
                         parser.stringFrom(xml: response, name: Constants.PB_STATUS),
-                        paymentId: parser.stringFrom(xml: response, name: Constants.PB_PAYMENT_ID),
-                        recurringProfile: parser.stringFrom(xml: response, name: Constants.PB_RECURRING_PROFILE),
-                        recurringExpireDate: parser.stringFrom(xml: response, name: Constants.PB_RECURRING_EXPIRE_DATE),
-                        currency: parser.stringFrom(xml: response, name: Constants.PB_CURRENCY),
-                        amount: Float(parser.stringFrom(xml: response, name: Constants.PB_AMOUNT))!))
+                              paymentId: parser.stringFrom(xml: response, name: Constants.PB_PAYMENT_ID),
+                              recurringProfile: parser.stringFrom(xml: response, name: Constants.PB_RECURRING_PROFILE),
+                              recurringExpireDate: parser.stringFrom(xml: response, name: Constants.PB_RECURRING_EXPIRE_DATE),
+                              currency: parser.stringFrom(xml: response, name: Constants.PB_CURRENCY),
+                              amount: Float(parser.stringFrom(xml: response, name: Constants.PB_AMOUNT))!))
             }
             break
         case .REVOKE:
@@ -130,7 +130,9 @@ open class PBHelper : PBConnection {
     }
     private func showWebView(url: String, operation: PBHelper.OPERATION){
         let webView: WebController = WebController(url: url, helper: self, operation: operation)
-        UIApplication.shared.keyWindow?.rootViewController?.present(webView, animated: true, completion: nil)
+        if let vc = currenctVC {
+            vc.present(webView, animated: true, completion: nil)
+        }
     }
     public var defParameters: [String:String] {
         var params: [String:String] = [:]
@@ -138,7 +140,8 @@ open class PBHelper : PBConnection {
         params.updateValue(String(PBHelper.configuration.isTEST.hashValue), forKey: Constants.PB_TESTING_MODE)
         return params
     }
-    public func cardPay(paymentId: Int){
+    public func cardPay(paymentId: Int, currentViewController: UIViewController){
+        self.currenctVC = currentViewController
         var param = defParameters
         param.updateValue(String(paymentId), forKey: Constants.PB_PAYMENT_ID)
         var params: [(key: String, value: String)] = parser.sort(array: param)
@@ -169,7 +172,8 @@ open class PBHelper : PBConnection {
         params.updateValue(userId, forKey: Constants.PB_USER_ID)
         initial(operation: .CARDLIST, params: params)
     }
-    public func addCard(userId: String, postUrl: String) {
+    public func addCard(userId: String, postUrl: String, currentViewController: UIViewController) {
+        self.currenctVC = currentViewController
         var params: [String:String] = defParameters
         params.updateValue(userId, forKey: Constants.PB_USER_ID)
         params.updateValue(postUrl, forKey: Constants.PB_POST_URL)
@@ -207,8 +211,9 @@ open class PBHelper : PBConnection {
         params.updateValue(String(paymentId), forKey: Constants.PB_PAYMENT_ID)
         initial(operation: .CAPTURE, params: params)
     }
-    public func initPayment(orderId: String?, userId: String, amount: Float, description: String, extraParams: [String:String]?){
+    public func initPayment(orderId: String?, userId: String, amount: Float, description: String, extraParams: [String:String]?, currentViewController: UIViewController){
         var params = PBHelper.configuration.toArray
+        self.currenctVC = currentViewController
         params.updateValue(userId, forKey: Constants.PB_USER_ID)
         params.updateValue(String(amount), forKey: Constants.PB_AMOUNT)
         params.updateValue(description, forKey: Constants.PB_DESCRIPTION)
@@ -320,7 +325,7 @@ open class PBHelper : PBConnection {
                     PBHelper.sharedInstance = PBHelper()
                 }
             }
-             
+            
             return PBHelper.sharedInstance!
         }
     }

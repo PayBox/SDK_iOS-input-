@@ -15,14 +15,14 @@ PayBox SDK - это библиотека позволяющая упростит
 
 **Установка:**
 
-1. Установите &quot;Cocoapods&quot; - менеджер зависимостей проектов Cocoa, с помощью команды:
+1. Установите "Cocoapods" - менеджер зависимостей проектов Cocoa, с помощью команды:
 ```
         $ gem install cocoapods
 ```
-1. Чтобы интегрировать &quot;PayBoxSdk&quot; в проект Xcode с использованием &quot;Cocoapods&quot;, создайте в корне проекта файл &quot;Podfile&quot; и вставьте в файл следующую команду:
+1. Чтобы интегрировать "PayBoxSdk"; в проект Xcode с использованием "Cocoapods", создайте в корне проекта файл "Podfile" и вставьте в файл следующую команду:
 ```
         source 'https://github.com/CocoaPods/Specs.git' 
-        platform :ios, '10.0';
+        platform :ios, '12.1';
         use_frameworks!
         target 'Project name' do
         pod 'PayBoxSdk', :git => 'https://github.com/PayBox/SDK_iOS-input-.git', :submodules => true
@@ -79,11 +79,11 @@ PayBox SDK - это библиотека позволяющая упростит
 ```
         PBHelper.sdk.pbDelegate(delegate: self)
 ```
-**Для инициализации платежа** (при инициализации с параметром &quot;builder.enableRecurring(int)&quot;, карты сохраняются в системе PayBox):
+**Для инициализации платежа** (при инициализации с параметром "builder.enableRecurring(int)", карты сохраняются в системе PayBox):
 
-        PBHelper.sdk.initPayment(orderId: String, userId: Int, amount: Float, description: String, extraParams: [String: String]?)
+        PBHelper.sdk.initPayment(orderId: String, userId: Int, amount: Float, description: String, extraParams: [String: String]?, currentViewController: UIViewController)
 
-В ответ откроется &quot;webView&quot; для заполнения карточных данных, после успешной оплаты вызовется функция:
+В ответ откроется "webView" для заполнения карточных данных, после успешной оплаты вызовется функция:
 ```
         override func onPaymentPaid(response: Response)
 ```
@@ -142,9 +142,9 @@ PayBox SDK - это библиотека позволяющая упростит
 
 **Для добавления карты:**
 ```
-        PBHelper.sdk.addCard(userId: Int, postUrl: String) //postUrl - для обратной связи
+        PBHelper.sdk.addCard(userId: Int, postUrl: String, currentViewController: UIViewController) //postUrl - для обратной связи
 ```
-В ответ откроется &quot;webView&quot; для заполнения карточных данных, после успешной операции вызовется метод:
+В ответ откроется "webView" для заполнения карточных данных, после успешной операции вызовется метод:
 ```
         override func onCardAdded(response: Response)
 ```
@@ -178,9 +178,9 @@ PayBox SDK - это библиотека позволяющая упростит
 
 **Для проведения платежа добавленной картой:**
 ```
-        PBHelper.sdk.cardPay(paymentId: Int)
+        PBHelper.sdk.cardPay(paymentId: Int, currentViewController: UIViewController)
 ```
-В ответ откроется &quot;webView&quot;, после успешной операции вызовется метод:
+В ответ откроется "webView", после успешной операции вызовется метод:
 ```
         override func onCardPaid(response: Response)
 ```
