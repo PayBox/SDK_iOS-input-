@@ -22,7 +22,7 @@ PayBox SDK - это библиотека позволяющая упростит
 1. Чтобы интегрировать &quot;PayBoxSdk&quot; в проект Xcode с использованием &quot;Cocoapods&quot;, создайте в корне проекта файл &quot;Podfile&quot; и вставьте в файл следующую команду:
 ```
         source 'https://github.com/CocoaPods/Specs.git' 
-        platform :ios, '10.0';
+        platform :ios, '12.1';
         use_frameworks!
         target 'Project name' do
         pod 'PayBoxSdk', :git => 'https://github.com/PayBox/SDK_iOS-input-.git', :submodules => true
