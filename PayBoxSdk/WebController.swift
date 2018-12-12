@@ -69,9 +69,12 @@ class WebController: UIViewController, UIWebViewDelegate {
         
         switch operation {
         case .CARDPAY:
-            if String(describing: request.url!).range(of: Constants.PB_URL) != nil  {
+            if String(describing: request.url!).range(of: Constants.SUCCESS) != nil  {
                 self.dismiss(animated: true, completion: nil)
                 helper.webSubmited(operation: operation, isSuccess: true)
+            } else if String(describing: request.url!).range(of: Constants.FAILURE) != nil {
+                self.dismiss(animated: true, completion: nil)
+                helper.webSubmited(operation: operation, isSuccess: false)
             }
             return true
         case .CARDADD:

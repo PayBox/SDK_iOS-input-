@@ -10,7 +10,6 @@ import Foundation
 open class PBHelper : PBConnection {
     
     private static var configuration: PBConfiguration!
-    private var currenctVC: UIViewController?
     public enum OPERATION {
         case PAYMENT
         case REVOKE
@@ -130,18 +129,18 @@ open class PBHelper : PBConnection {
     }
     private func showWebView(url: String, operation: PBHelper.OPERATION){
         let webView: WebController = WebController(url: url, helper: self, operation: operation)
-        if let vc = currenctVC {
-            vc.present(webView, animated: true, completion: nil)
+        if let top = UIApplication.shared.topMostViewController() {
+            top.present(webView, animated: true, completion: nil)
         }
+        
     }
     public var defParameters: [String:String] {
         var params: [String:String] = [:]
         params.updateValue(String(PBHelper.configuration.MERCHANT_ID), forKey: Constants.PB_MERCHANT_ID)
-        params.updateValue(String(PBHelper.configuration.isTEST.hashValue), forKey: Constants.PB_TESTING_MODE)
+        params.updateValue(String(PBHelper.configuration.isTEST  ?1:0), forKey: Constants.PB_TESTING_MODE)
         return params
     }
-    public func cardPay(paymentId: Int, currentViewController: UIViewController){
-        self.currenctVC = currentViewController
+    public func cardPay(paymentId: Int){
         var param = defParameters
         param.updateValue(String(paymentId), forKey: Constants.PB_PAYMENT_ID)
         var params: [(key: String, value: String)] = parser.sort(array: param)
@@ -150,10 +149,15 @@ open class PBHelper : PBConnection {
         showWebView(url: parser.urlGet(from: params, mainUrl: Constants.PB_CARDPAY_MERCHANT(merchantId: PBHelper.configuration.MERCHANT_ID).appending(Constants.PB_CARDPAY)), operation: .CARDPAY)
     }
     public func initCardPayment(amount: Float, userId: String, cardId: Int, orderId: String, description: String, extraParams: [String:String]?){
-        var params : [String:String] = defParameters
+        var params : [String:String] = PBHelper.configuration.toArray
         if extraParams != nil {
             params = params.merging(extraParams!, uniquingKeysWith: {(first, _) in first})
         }
+        if let resultUrl = PBHelper.configuration.RESULT_URL {
+            params.updateValue(resultUrl, forKey: Constants.PB_RESULT_URL)
+        }
+        params.updateValue(Constants.SUCCESS, forKey: Constants.PB_SUCCESS_URL)
+        params.updateValue(Constants.FAILURE, forKey: Constants.PB_FAILURE_URL)
         params.updateValue(userId, forKey: Constants.PB_USER_ID)
         params.updateValue(String(cardId), forKey: Constants.PB_CARD_ID)
         params.updateValue(String(orderId), forKey: Constants.PB_ORDER_ID)
@@ -172,8 +176,7 @@ open class PBHelper : PBConnection {
         params.updateValue(userId, forKey: Constants.PB_USER_ID)
         initial(operation: .CARDLIST, params: params)
     }
-    public func addCard(userId: String, postUrl: String, currentViewController: UIViewController) {
-        self.currenctVC = currentViewController
+    public func addCard(userId: String, postUrl: String) {
         var params: [String:String] = defParameters
         params.updateValue(userId, forKey: Constants.PB_USER_ID)
         params.updateValue(postUrl, forKey: Constants.PB_POST_URL)
@@ -211,9 +214,8 @@ open class PBHelper : PBConnection {
         params.updateValue(String(paymentId), forKey: Constants.PB_PAYMENT_ID)
         initial(operation: .CAPTURE, params: params)
     }
-    public func initPayment(orderId: String?, userId: String, amount: Float, description: String, extraParams: [String:String]?, currentViewController: UIViewController){
+    public func initPayment(orderId: String?, userId: String, amount: Float, description: String, extraParams: [String:String]?){
         var params = PBHelper.configuration.toArray
-        self.currenctVC = currentViewController
         params.updateValue(userId, forKey: Constants.PB_USER_ID)
         params.updateValue(String(amount), forKey: Constants.PB_AMOUNT)
         params.updateValue(description, forKey: Constants.PB_DESCRIPTION)
@@ -328,5 +330,29 @@ open class PBHelper : PBConnection {
             
             return PBHelper.sharedInstance!
         }
+    }
+}
+
+extension UIViewController {
+    func topMostViewController() -> UIViewController {
+        if self.presentedViewController == nil {
+            return self
+        }
+        if let navigation = self.presentedViewController as? UINavigationController {
+            return navigation.visibleViewController!.topMostViewController()
+        }
+        if let tab = self.presentedViewController as? UITabBarController {
+            if let selectedTab = tab.selectedViewController {
+                return selectedTab.topMostViewController()
+            }
+            return tab.topMostViewController()
+        }
+        return self.presentedViewController!.topMostViewController()
+    }
+}
+
+extension UIApplication {
+    func topMostViewController() -> UIViewController? {
+        return self.keyWindow?.rootViewController?.topMostViewController()
     }
 }

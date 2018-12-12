@@ -2,12 +2,11 @@
 //  PayBoxSdk.h
 //  PayBoxSdk
 //
-//  Created by Arman Mergenbayev on 22.11.2017.
-//  Copyright © 2017 paybox. All rights reserved.
+//  Created by Arman on 06.12.2018.
+//  Copyright © 2018 Arman. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
-//#import <CommonCrypto/CommonCrypto.h>
 
 //! Project version number for PayBoxSdk.
 FOUNDATION_EXPORT double PayBoxSdkVersionNumber;
