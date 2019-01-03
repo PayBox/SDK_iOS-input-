@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.author             = { "Arman" => "am@paybox.money" }
   s.public_header_files = 'PayBoxSdk/*.h'
   s.preserve_paths = 'PayBoxSdk/commonCrypto/module.modulemap'
-  s.ios.deployment_target = '12.1'
+  s.ios.deployment_target = '9.0'
   s.requires_arc = true
   s.source       = { :git => "https://github.com/PayBox/SDK_iOS-input-.git", :tag => "#{s.version}" }
   s.source_files  = 'PayBoxSdk/*.{swift,h}', 'PayBoxSdk/commonCrypto/*.{c,h}'
