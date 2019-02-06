@@ -217,7 +217,7 @@ open class PBHelper : PBConnection {
     public func initPayment(orderId: String?, userId: String?, amount: Float, description: String, extraParams: [String:String]?){
         var params = PBHelper.configuration.toArray
         if userId != nil {
-            params.updateValue(userId, forKey: Constants.PB_USER_ID)
+            params.updateValue(userId!, forKey: Constants.PB_USER_ID)
         }
         params.updateValue(String(amount), forKey: Constants.PB_AMOUNT)
         params.updateValue(description, forKey: Constants.PB_DESCRIPTION)
