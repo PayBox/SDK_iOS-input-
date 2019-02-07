@@ -63,9 +63,7 @@ class WebController: UIViewController, UIWebViewDelegate {
     }
     
     func webView(_ webView: UIWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
-        if String(describing: request.url!).range(of: webUrl) != nil || String(describing: request.url!).range(of: "jsp") != nil {
-            return true
-        }
+        
         
         switch operation {
         case .CARDPAY:
@@ -88,11 +86,6 @@ class WebController: UIViewController, UIWebViewDelegate {
             }
             return true
         case .PAYMENT:
-            if customer != nil {
-                if String(describing: request.url!).range(of: customer!) != nil {
-                    return true
-                }
-            }
             if String(describing: request.url!).range(of: Constants.SUCCESS) != nil  {
                 self.dismiss(animated: true, completion: nil)
                 helper.webSubmited(operation: operation, isSuccess: true)
@@ -102,7 +95,7 @@ class WebController: UIViewController, UIWebViewDelegate {
                 self.dismiss(animated: true, completion: nil)
                 helper.webSubmited(operation: operation, isSuccess: false)
             }
-            break
+            return true
         default:
             break
         }
