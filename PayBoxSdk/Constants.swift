@@ -10,7 +10,7 @@ import Foundation
 
 public struct Constants {
     public static let PB_URL = "http://paybox.money/"
-    public static let PB_MAIN_URL = "https://paybox.kz/"
+    public static let PB_MAIN_URL = "https://api.paybox.money/"
     public static let PB_ENTRY_URL = "init_payment.php"
     public static let PB_STATUS_URL = "get_status.php"
     public static let PB_REVOKE_URL = "revoke.php"
