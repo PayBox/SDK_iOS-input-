@@ -1,0 +1,82 @@
+
+import Foundation
+
+class Urls {
+    static let BASE_URL = "https://api.paybox.money/"
+    static let STATUS_URL = BASE_URL + "get_status.php"
+    static let INIT_PAYMENT_URL = BASE_URL + "init_payment.php"
+    static let REVOKE_URL = BASE_URL + "revoke.php"
+    static let CANCEL_URL = BASE_URL + "cancel.php"
+    static let CLEARING_URL = BASE_URL + "do_capture.php"
+    static let RECURRING_URL = BASE_URL + "make_recurring_payment.php"
+    static let CARDSTORAGE = "/cardstorage/"
+    static let CARD = "/card/"
+    static let LISTCARD_URL = "list"
+    static let CARDINITPAY = "init"
+    static let ADDCARD_URL = "add"
+    static let PAY = "pay"
+    static let REMOVECARD_URL = "remove"
+    
+    static func CARD_PAY(merchant_id: Int) -> String {
+        return BASE_URL + "v1/merchant/\(merchant_id)" + CARD
+    }
+    static func CARD_MERCHANT(merchant_id: Int) -> String {
+        return BASE_URL + "v1/merchant/\(merchant_id)" + CARDSTORAGE
+    }
+}
+
+class Params {
+    static let RECURRING_PROFILE_ID = "pg_recurring_profile_id"
+    static let CARD_CREATED_AT = "created_at"
+    static let RESPONSE = "response"
+    static let PAYMENT_FAILURE = "Не удалось оплатить"
+    static let UNKNOWN_ERROR = "Неизвестная ошибка"
+    static let CONNECTION_ERROR = "Ошибка подключения"
+    static let FORMAT_ERROR = "Неправильный формат ответа"
+    static let RECURRING_PROFILE_EXPIRY = "pg_recurring_profile_expiry_date"
+    static let CLEARING_AMOUNT = "pg_clearing_amount"
+    static let REFUND_AMOUNT = "pg_refund_amount"
+    static let ERROR_CODE = "pg_error_code"
+    static let ERROR_DESCRIPTION = "pg_error_description"
+    static let CAPTURED = "pg_captured"
+    static let CARD_PAN = "pg_card_pan"
+    static let CREATED_AT = "pg_create_date"
+    static let TRANSACTION_STATUS = "pg_transaction_status"
+    static let CAN_REJECT = "pg_can_reject"
+    static let REDIRECT_URL = "pg_redirect_url"
+    static let MERCHANT_ID = "pg_merchant_id"
+    static let SIG = "pg_sig"
+    static let SALT = "pg_salt"
+    static let STATUS = "pg_status"
+    static let CARD_ID = "pg_card_id"
+    static let CARD_HASH = "pg_card_hash"
+    static let TEST_MODE = "pg_testing_mode"
+    static let RECURRING_START = "pg_recurring_start"
+    static let AUTOCLEARING = "pg_auto_clearing"
+    static let REQUEST_METHOD = "pg_request_method"
+    static let CURRENCY = "pg_currency"
+    static let LIFETIME = "pg_lifetime"
+    static let ENCODING = "pg_encoding"
+    static let RECURRING_LIFETIME = "pg_recurring_lifetime"
+    static let PAYMENT_SYSTEM = "pg_payment_system"
+    static let SUCCESS_METHOD = "pg_success_url_method"
+    static let FAILURE_METHOD = "pg_failure_url_method"
+    static let SUCCESS_URL = "pg_success_url"
+    static let FAILURE_URL = "pg_failure_url"
+    static let BACK_LINK = "pg_back_link"
+    static let POST_LINK = "pg_post_link"
+    static let LANGUAGE = "pg_language"
+    static let USER_PHONE = "pg_user_phone"
+    static let USER_CONTACT_EMAIL = "pg_user_contact_email"
+    static let USER_EMAIL = "pg_user_email"
+    static let CAPTURE_URL = "pg_capture_url"
+    static let REFUND_URL = "pg_refund_url"
+    static let RESULT_URL = "pg_result_url"
+    static let CHECK_URL = "pg_check_url"
+    static let USER_ID = "pg_user_id"
+    static let ORDER_ID = "pg_order_id"
+    static let DESCRIPTION = "pg_description"
+    static let RECURRING_PROFILE = "pg_recurring_profile"
+    static let AMOUNT = "pg_amount"
+    static let PAYMENT_ID = "pg_payment_id"
+}
