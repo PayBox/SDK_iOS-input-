@@ -1,202 +1,207 @@
-**PayBox SDK (Swift)**
+**Paybox SDK (iOS, Swift)**
 
-PayBox SDK - это библиотека позволяющая упростить взаимодействие с API PayBox. Система SDK работает на iOS 10.3 и выше
+PayBox SDK iOS - это библиотека позволяющая упростить взаимодействие с API PayBox.
 
 **Описание возможностей:**
 
 - Инициализация платежа
 - Отмена платежа
 - Возврат платежа
+- Проведение клиринга
 - Проведение рекуррентного платежа с сохраненными картами
 - Получение информации/статуса платежа
-- Добавление карт
+- Добавление карт/Удаление карт
 - Оплата добавленными картами
-- Удаление карт
 
 **Установка:**
 
-1. Установите "Cocoapods" - менеджер зависимостей проектов Cocoa, с помощью команды:
+1. Чтобы интегрировать "PayBoxSdk"; в проект Xcode с использованием "Cocoapods", добавьте в "Podfile":
 ```
-        $ gem install cocoapods
-```
-1. Чтобы интегрировать "PayBoxSdk"; в проект Xcode с использованием "Cocoapods", создайте в корне проекта файл "Podfile" и вставьте в файл следующую команду:
-```
-        source 'https://github.com/CocoaPods/Specs.git' 
-        platform :ios, '12.1';
-        use_frameworks!
         target 'Project name' do
-        pod 'PayBoxSdk', :git => 'https://github.com/PayBox/SDK_iOS-input-.git', :submodules => true
+            pod 'PayBoxSdk', :git => 'https://github.com/PayBox/SDK_iOS-input-.git', :submodules => true
         end
 ```
-1. Затем выполните след. команду:
+2. Затем выполните след. команду:
 ```       
         $ pod install
 ```
-**Инициализация SDK:**
-```
-        import PayBoxSdk
 
-        let builder = PBHelper.Builder(secretKey: String, merchantId: String)
+**Работа с SDK**
+
+*Инициализация SDK:*
+
 ```
-Выбор платежной системы:
-```
-        builder.paymentSystem(system: .EPAYWEBKZT)
-```
-Выбор валюты платежа:
-```
-        builder.paymentCurrency(currency: .KZT)
-```
-Дополнительная информация пользователя, если не указано, то выбор будет предложен на сайте платежного гейта:
-```
-        builder.userInfo(email: string, phoneNumber: String)
-```
-Активация автоклиринга:
-```
-        builder.autoClearing(enabled: true)
-```
-Для активации режима тестирования:
-```
-        builder.testMode(enabled: true)
-```
-Для передачи информации от платежного гейта:
-```
-        builder.feedBackUrl(checkUrl: String, resultUrl: String, refundUrl: String, captureUrl: String, method: REQUEST\_METHOD)
-```
-Время (в секундах) в течение которого платеж должен быть завершен, в противном случае, при проведении платежа, PayBox откажет платежной системе в проведении (мин. 300 (5 минут), макс. 604800 (7 суток), по умолчанию 300):
-```
-        builder.paymentLifeTime(lifetime: 300)
+    let sdk = PayboxSdk.initialize(merchantId: merchantID, secretKey: "secretKey")
 ```
 
-**Инициализация параметров:**
+Добавьте PaymentView в ваш UIViewController:
+
 ```
-        builder.build()
+    @IBOutlet weak var paymentView: PaymentView!
 ```
 
-**Работа с SDK:**
+Передайте экземпляр paymentView в sdk:
 
-Для связи с SDK,  имплементируйте в UIViewController -> PBDelegate:
-В методе viewDidLoad() добавьте:
 ```
-        PBHelper.sdk.pbDelegate(delegate: self)
-```
-**Для инициализации платежа** (при инициализации с параметром "builder.enableRecurring(int)", карты сохраняются в системе PayBox):
-
-        PBHelper.sdk.initPayment(orderId: String, userId: Int, amount: Float, description: String, extraParams: [String: String]?, currentViewController: UIViewController)
-
-В ответ откроется "webView" для заполнения карточных данных, после успешной оплаты вызовется функция:
-```
-        override func onPaymentPaid(response: Response)
+    sdk.setPaymentView(paymentView: paymentView)
 ```
 
-**Для отмены платежа, по которому не прошел клиринг:**
+Для отслеживания прогресса загрузки платежной страницы используйте WebDelegate:
 ```
-        PBHelper.sdk.initCancelPayment(paymentId: Int)
-```
-После успешной операции вызовется метод:
-```
-        override func onPaymentCanceled(response: Response)
-```
-Активация режима рекуррентного платежа: во входном параметре указывается время, на протяжении которого продавец рассчитывает использовать профиль рекуррентных платежей. Минимальное допустимое значение 1 (1 месяц). Максимальное допустимое значение: 156 (13 лет):
-```
-        PBHelper.sdk.enableRecurring(lifetime: 3)
-```
-Отключение режима рекуррентного платежа:
-```
-        PBHelper.sdk.disableRecurring()
+    paymentView.delegate = self
+
+    func loadStarted() {
+
+    }
+    func loadFinished() {
+
+    }
 ```
 
-**Для проведения возврата платежа, по которому прошел клиринг:**
-```
-        PBHelper.sdk.initRevokePayment(paymentId: Int, amount: Float)
-```
-После успешной операции вызовется метод:
+*Создание платежа:*
 
-        override func onPaymentRevoked(response: Response)
+```
+    sdk.createPayment(amount: amount, description: "description", orderId: "orderId", userId: userId, extraParams: extra) {
+            payment, error in   //Вызовется после оплаты
+    }
+```
+После вызова в paymentView откроется платежная страница
 
-**Для проведения рекуррентного платежа добавленной картой:**
-```
-        PBHelper.sdk.makeRecurring(amount: Float, recurringProfile: String, description: String, extraParams: [String: String]?)
-```
-После успешной операции вызовется метод:
-```
-        override func onRecurringPaid(recurringResponse: Recurring)
-```
 
-**Для получения статуса платежа:**
+*Рекурентный платеж:*
 ```
-        PBHelper.sdk.getPaymentStatus(paymentId: Int)
-```
-После успешной операции вызовется метод:
-```
-        override func onPaymentStatus(status: PStatus)
+    sdk.createRecurringPayment(amount: amount, description: "description", recurringProfile: "profile", orderId: "orderId", extraParams: extra) {
+            recurringPayment, error in // Вызовется после оплаты
+    }
 ```
 
-**Для проведения клиринга:**
+*Получение статуса платежа:*
 ```
-        PBHelper.sdk.initPaymentDoCapture(paymentId: Int)
-```
-После успешной операции вызовется метод:
-```
-        override func onPaymentCaptured(capture: Capture)
+    sdk.getPaymentStatus(paymentId: paymentId) {
+            status, error in // Вызовется после получения ответа
+    }
 ```
 
-**Для добавления карты:**
+*Клиринг платежа:*
 ```
-        PBHelper.sdk.addCard(userId: Int, postUrl: String, currentViewController: UIViewController) //postUrl - для обратной связи
-```
-В ответ откроется "webView" для заполнения карточных данных, после успешной операции вызовется метод:
-```
-        override func onCardAdded(response: Response)
+    sdk.makeClearingPayment(paymentId: paymentId, amount: amount) {  // Если указать nil вместо суммы клиринга, то клиринг пройдет на всю сумму платежа
+            capture, error in // Вызовется после клиринга
+    }
 ```
 
-**Для удаления карт:**
+*Отмена платежа:*
 ```
-        PBHelper.sdk.removeCard(userId: Int, cardId: Int)
-```
-После успешной операции вызовется метод:
-```
-        override func onCardRemoved(card: Card)
+    sdk.makeCancelPayment(paymentId: paymentId) {
+            payment, error in // Вызовется после отмены
+    }
 ```
 
-**Для отображения списка карт:**
+*Возврат платежа:*
 ```
-        PBHelper.sdk.getCards(userId: Int)
-```
-После успешной операции вызовется метод:
-```
-        override func onCardListed(cards: [Int : Card])
+    sdk.makeRevokePayment(paymentId: paymentId, amount: amount) {
+            payment, error in // Вызовется после возврата
+    }
 ```
 
-**Для создания платежа добавленной картой:**
+*Сохранение карты:*
 ```
-        PBHelper.sdk.initCardPayment(amount: Float, userId: Int, cardId: Int, orderId: String, description: String, extraParams: [String: String]?)
+    sdk.addNewCard(postLink: "url", userId: userId) {
+            payment, error in // Вызовется после сохранения
+    }
 ```
-После успешной операции вызовется метод:
+После вызова в paymentView откроется платежная страница
+
+*Получить список сохраненых карт:*
 ```
-        override func onCardPayInited(response: Response)
+    sdk.getAddedCards(userId: userId) {
+            cards, error in // Вызовется после получения ответа
+    }
 ```
 
-**Для проведения платежа добавленной картой:**
+*Удаление сохраненой карты:*
 ```
-        PBHelper.sdk.cardPay(paymentId: Int, currentViewController: UIViewController)
-```
-В ответ откроется "webView", после успешной операции вызовется метод:
-```
-        override func onCardPaid(response: Response)
+    sdk.removeAddedCard(cardId: 123123, userId: 229) {
+            payment, error in // Вызовется после ответа
+    }
 ```
 
-**Описание некоторых входных параметров**
+*Создание платежа сохраненой картой:*
+```
+    sdk.createCardPayment(amount: 100, userId: 229, cardId: 123123, description: "description", orderId: "01234", extraParams: nil) {
+            payment, error in // Вызовется после создания
+    }
+```
+Для оплаты созданного платежа:
+```
+    sdk.payByCard(paymentId: 2331231) {
+            payment, error in // Вызовется после оплаты
+    }
+```
+После вызова в paymentView откроется платежная страница для 3ds аутентификации
 
-1. orderId - Идентификатор платежа в системе продавца. Рекомендуется поддерживать уникальность этого поля.
-2. amount - Сумма платежа
-3. merchantId - Идентификатор продавца в системе PayBox. Выдается при подключении.
-4. secretKey - Платежный пароль, используется для защиты данных, передаваемых системой PayBox магазину и магазином системе Paybox
-5. userId - Идентификатор клиента в системе магазина продавца.
-6. paymentId - Номер платежа сформированный в системе PayBox.
-7. description - Описание товара или услуги. Отображается покупателю в процессе платежа.
-8. extraParams - Дополнительные параметры продавца. Имена дополнительных параметров продавца должны быть уникальными. 
-9. checkUrl - URL для проверки возможности платежа. Вызывается перед платежом, если платежная система предоставляет такую возможность. Если параметр не указан, то берется из настроек магазина. Если параметр установлен равным пустой строке, то проверка возможности платежа не производится.
-10. resultUrl - URL для сообщения о результате платежа. Вызывается после платежа в случае успеха или неудачи. Если параметр не указан, то берется из настроек магазина. Если параметр установлен равным пустой строке, то PayBox не сообщает магазину о результате платежа.
-11. refundUrl - URL для сообщения об отмене платежа. Вызывается после платежа в случае отмены платежа на стороне PayBoxа или ПС. Если параметр не указан, то берется из настроек магазина.
-12. captureUrl - URL для сообщения о проведении клиринга платежа по банковской карте. Если параметр не указан, то берется из настроек магазина.
-13. REQUEST_METHOD - GET, POST или XML – метод вызова скриптов магазина checkUrl, resultUrl, refundUrl, captureUrl для передачи информации от платежного гейта.
+
+**Настройки SDK**
+
+*Тестовый режим:*
+```
+    sdk.config().testMode(enabled: true) // По умолчанию тестовый режим включен
+```
+
+*Выбор платежной системы:*
+```
+    sdk.config().setPaymentSystem(paymentSystem: paymentSystem)
+```
+
+*Выбор валюты платежа:*
+```
+    sdk.config().setCurrencyCode(code: "KZT")
+```
+
+*Активация автоклиринга:*
+```
+    sdk.config().autoClearing(enabled: enabled)
+```
+
+*Установка кодировки:*
+```
+    sdk.config().setEncoding(encoding: "UTF-8") // по умолчанию UTF-8
+```
+
+*Время жизни рекурентного профиля:*
+```
+    sdk.config().setRecurringLifetime(lifetime: 36) //по умолчанию 36 месяцев
+```
+
+*Время жизни платежной страницы, в течение которого платеж должен быть завершен:*
+```
+    sdk.config().setPaymentLifetime(lifetime: 300)  //по умолчанию 300 секунд
+```
+
+*Включение режима рекурентного платежа:*
+```
+    recurringMode(enabled: enabled)  //по умолчанию отключен
+```
+
+*Номер телефона клиента, будет отображаться на платежной странице. Если не указать, то будет предложено ввести на платежной странице:*
+```
+    sdk.config().setUserPhone(userPhone: "userPhone")
+```
+
+*Email клиента, будет отображаться на платежной странице. Если не указать email, то будет предложено ввести на платежной странице:*
+```
+    sdk.config().setUserEmail(userEmail: "email")
+```
+
+*Язык платежной страницы:*
+```
+    sdk.config().setLanguage(language: .ru)
+```
+
+*Для передачи информации от платежного гейта:*
+```
+    sdk.config().setCheckUrl(url: "url")
+    sdk.config().setResultUrl(url: "url")
+    sdk.config().setRefundUrl(url: "url")
+    sdk.config().setClearingUrl(url: "url")
+    sdk.config().setRequestMethod(requestMethod: requestMethod)
+```
