@@ -19,13 +19,15 @@ open class PaymentView: UIView, WKNavigationDelegate {
     
     func loadPaymentPage(url: String, sucessOrFailure: @escaping (Bool) -> Void) {
         if (url.starts(with: "https://api.paybox.money") || url.starts(with:"https://paybox.money") || url.starts(with:"https://paybox.kz")) {
-            loadUrl(url: url)
+            loadUrl(urlStr: url)
             self.sOf = sucessOrFailure
         }
     }
     
-    private func loadUrl(url: String) {
-        self.webView.load(URLRequest(url: URL(string: url)!))
+    private func loadUrl(urlStr: String) {
+        if let url = URL(string: urlStr) {
+            self.webView.load(URLRequest(url: url))
+        }
     }
     
     public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
