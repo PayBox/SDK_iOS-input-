@@ -21,11 +21,11 @@ public protocol PayboxSdkProtocol {
     /// Пример кода:
     /// ----
     ///
-    ///     sdk.createPayment(amount: 100, description: "description", orderId: "01234", userId: 229, extraParams: nil) {
+    ///     sdk.createPayment(amount: 100, description: "description", orderId: "01234", userId: "229", extraParams: nil) {
     ///             payment, error  in // Вызовется после оплаты
     ///     }
     ///
-    func createPayment(amount: Float, description: String, orderId: String?, userId: Int?, extraParams: [String:String]?, paymentPaid: @escaping (Payment?, Error?)->Void)
+    func createPayment(amount: Float, description: String, orderId: String?, userId: String?, extraParams: [String:String]?, paymentPaid: @escaping (Payment?, Error?)->Void)
     
     /// Создание рекурентного платежа
     /// - parameters:
@@ -58,11 +58,11 @@ public protocol PayboxSdkProtocol {
     /// Пример кода:
     /// ----
     ///
-    ///     sdk.createCardPayment(amount: 100, userId: 229, cardId: 123123, description: "description", orderId: "01234", extraParams: nil) {
+    ///     sdk.createCardPayment(amount: 100, userId: "229", cardId: 123123, description: "description", orderId: "01234", extraParams: nil) {
     ///             payment, error in // Вызовется после создания
     ///     }
     ///
-    func createCardPayment(amount: Float, userId: Int, cardId: Int, description: String, orderId: String, extraParams: [String:String]?, payInited: @escaping (Payment?, Error?)->Void)
+    func createCardPayment(amount: Float, userId: String, cardId: Int, description: String, orderId: String, extraParams: [String:String]?, payInited: @escaping (Payment?, Error?)->Void)
     
     /// Оплата созданного платежа, добавленной картой
     /// - parameters:
@@ -149,7 +149,7 @@ public protocol PayboxSdkProtocol {
     ///             payment, error in // Вызовется после сохранения
     ///     }
     ///
-    func addNewCard(postLink: String?, userId: Int, cardAdded: @escaping (Payment?, Error?)->Void)
+    func addNewCard(postLink: String?, userId: String, cardAdded: @escaping (Payment?, Error?)->Void)
     
     /// Удаление сохраненой карты
     /// - parameters:
@@ -160,11 +160,11 @@ public protocol PayboxSdkProtocol {
     /// Пример кода:
     /// ----
     ///
-    ///     sdk.removeAddedCard(cardId: 123123, userId: 229) {
+    ///     sdk.removeAddedCard(cardId: 123123, userId: "229") {
     ///             payment, error in // Вызовется после ответа
     ///     }
     ///
-    func removeAddedCard(cardId: Int, userId: Int, removed: @escaping (Card?, Error?)->Void)
+    func removeAddedCard(cardId: Int, userId: String, removed: @escaping (Card?, Error?)->Void)
     
     /// Получить список сохраненых карт
     /// - parameters:
@@ -174,11 +174,11 @@ public protocol PayboxSdkProtocol {
     /// Пример кода:
     /// ----
     ///
-    ///     sdk.getAddedCards(userId: 229) {
+    ///     sdk.getAddedCards(userId: "229") {
     ///             cards, error in // Вызовется после получения ответа
     ///     }
     ///
-    func getAddedCards(userId: Int, cardList: @escaping (Array<Card>?, Error?)->Void)
+    func getAddedCards(userId: String, cardList: @escaping (Array<Card>?, Error?)->Void)
     
     /// Настройки Sdk
     ///

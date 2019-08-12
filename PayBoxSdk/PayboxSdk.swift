@@ -29,7 +29,7 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
         self.paymentView = paymentView
     }
     
-    public func createPayment(amount: Float, description: String, orderId: String?, userId: Int?, extraParams: [String : String]?, paymentPaid: @escaping (Payment?, Error?) -> Void) {
+    public func createPayment(amount: Float, description: String, orderId: String?, userId: String?, extraParams: [String : String]?, paymentPaid: @escaping (Payment?, Error?) -> Void) {
         self.paymentPaid = paymentPaid
         var params = configs.getParams(extraParams: extraParams)
         params[Params.AMOUNT] = "\(amount)"
@@ -38,7 +38,7 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
             params[Params.ORDER_ID] = orderId!
         }
         if let userID = userId {
-            params[Params.USER_ID] = "\(userID)"
+            params[Params.USER_ID] = userID
         }
         apiHelper.initConnection(url: Urls.INIT_PAYMENT_URL, params: params)
     }
@@ -55,12 +55,12 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
         apiHelper.initConnection(url: Urls.RECURRING_URL, params: params)
     }
     
-    public func createCardPayment(amount: Float, userId: Int, cardId: Int, description: String, orderId: String, extraParams: [String : String]?, payInited: @escaping (Payment?, Error?) -> Void) {
+    public func createCardPayment(amount: Float, userId: String, cardId: Int, description: String, orderId: String, extraParams: [String : String]?, payInited: @escaping (Payment?, Error?) -> Void) {
         self.cardPayInited = payInited
         var params = configs.getParams(extraParams: extraParams)
         params[Params.ORDER_ID] = orderId
         params[Params.AMOUNT] = "\(amount)"
-        params[Params.USER_ID] = "\(userId)"
+        params[Params.USER_ID] = userId
         params[Params.CARD_ID] = "\(cardId)"
         params[Params.DESCRIPTION] = description
         apiHelper.initConnection(url: Urls.CARD_PAY(merchant_id: configs.merchantId)+Urls.CARDINITPAY, params: params)
@@ -118,28 +118,28 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
         apiHelper.initConnection(url: Urls.CANCEL_URL, params: params)
     }
     
-    public func addNewCard(postLink: String?, userId: Int, cardAdded: @escaping (Payment?, Error?) -> Void) {
+    public func addNewCard(postLink: String?, userId: String, cardAdded: @escaping (Payment?, Error?) -> Void) {
         self.cardAdded = cardAdded
         var params = configs.getParams()
-        params[Params.USER_ID] = "\(userId)"
+        params[Params.USER_ID] = userId
         if !(postLink ?? "").isEmpty {
             params[Params.POST_LINK] = postLink!
         }
         apiHelper.initConnection(url: Urls.CARD_MERCHANT(merchant_id: configs.merchantId) + Urls.ADDCARD_URL, params: params)
     }
     
-    public func removeAddedCard(cardId: Int, userId: Int, removed: @escaping (Card?, Error?) -> Void) {
+    public func removeAddedCard(cardId: Int, userId: String, removed: @escaping (Card?, Error?) -> Void) {
         self.cardRemove = removed
         var params = configs.getParams()
         params[Params.CARD_ID] = "\(cardId)"
-        params[Params.USER_ID] = "\(userId)"
+        params[Params.USER_ID] = userId
         apiHelper.initConnection(url: Urls.CARD_MERCHANT(merchant_id: configs.merchantId) + Urls.REMOVECARD_URL, params: params)
     }
     
-    public func getAddedCards(userId: Int, cardList: @escaping (Array<Card>?, Error?) -> Void) {
+    public func getAddedCards(userId: String, cardList: @escaping (Array<Card>?, Error?) -> Void) {
         self.cardList = cardList
         var params = configs.getParams()
-        params[Params.USER_ID] = "\(userId)"
+        params[Params.USER_ID] = userId
         apiHelper.initConnection(url: Urls.CARD_MERCHANT(merchant_id: configs.merchantId) + Urls.LISTCARD_URL, params: params)
     }
     
