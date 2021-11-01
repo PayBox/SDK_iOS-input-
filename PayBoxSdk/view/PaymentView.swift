@@ -2,9 +2,16 @@
 import WebKit
 open class PaymentView: UIView, WKNavigationDelegate {
     
-    open override func awakeFromNib() {
-        initWebView()
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.initWebView()
     }
+    
+    required public init?(coder: NSCoder) {
+        super.init(coder: coder)
+        self.initWebView()
+    }
+    
     public var delegate: WebDelegate? = nil
     private var webView: WKWebView!
     private var sOf: ((Bool) -> Void)? = nil
