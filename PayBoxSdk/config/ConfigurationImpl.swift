@@ -8,13 +8,13 @@ class ConfigurationImpl: ConfigurationProtocol {
     private var userPhone: String? = nil
     private var userEmail: String? = nil
     private var testMode = true
-    private var paymentSystem = PaymentSystem.EPAYWEBKZT
+    private var paymentSystem = PaymentSystem.NONE
     private var requestMethod = RequestMethod.POST
     private var language = Language.ru
     private var autoClearing = false
     private var encoding = "UTF-8"
     private var paymentLifetime = 300
-    private var recurringLifetime = 36
+    private var recurringLifetime = 0
     private var recurringMode = false
     private var checkUrl: String? = nil
     private var resultUrl: String? = "https://paybox.kz"
@@ -96,7 +96,9 @@ class ConfigurationImpl: ConfigurationProtocol {
         var params = [String:String]()
         params[Params.MERCHANT_ID] = "\(self.merchantId)"
         params[Params.TEST_MODE] = self.testMode.stringValue()
-        params[Params.PAYMENT_SYSTEM] = self.paymentSystem.rawValue
+        if (self.paymentSystem != .NONE) {
+            params[Params.PAYMENT_SYSTEM] = self.paymentSystem.rawValue
+        }
         return params
     }
     
@@ -113,8 +115,12 @@ class ConfigurationImpl: ConfigurationProtocol {
         params[Params.CURRENCY] = self.currencyCode
         params[Params.LIFETIME] = "\(self.paymentLifetime)"
         params[Params.ENCODING] = self.encoding
-        params[Params.RECURRING_LIFETIME] = "\(self.recurringLifetime)"
-        params[Params.PAYMENT_SYSTEM] = self.paymentSystem.rawValue
+        if(self.recurringLifetime > 0) {
+            params[Params.RECURRING_LIFETIME] = "\(self.recurringLifetime)"
+        }
+        if (self.paymentSystem != .NONE) {
+            params[Params.PAYMENT_SYSTEM] = self.paymentSystem.rawValue
+        }
         params[Params.SUCCESS_METHOD] = "GET"
         params[Params.FAILURE_METHOD] = "GET"
         params[Params.SUCCESS_URL] = self.successUrl
