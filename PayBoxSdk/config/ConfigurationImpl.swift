@@ -121,6 +121,7 @@ class ConfigurationImpl: ConfigurationProtocol {
         if (self.paymentSystem != .NONE) {
             params[Params.PAYMENT_SYSTEM] = self.paymentSystem.rawValue
         }
+        params[Params.TIMEOUT_AFTER_PAYMENT] = "0"
         params[Params.SUCCESS_METHOD] = "GET"
         params[Params.FAILURE_METHOD] = "GET"
         params[Params.SUCCESS_URL] = self.successUrl
