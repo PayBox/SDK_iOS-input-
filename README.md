@@ -127,6 +127,11 @@ PayBox SDK iOS - это библиотека позволяющая упрост
     sdk.config().setRequestMethod(requestMethod: requestMethod)
 ```
 
+*Для отображения Frame вместо платежной страницы:*
+```
+    sdk.config().setFrameRequired(isRequired: true) //false по умолчанию
+```
+        
 
 # **Работа с SDK**
 
