@@ -15,6 +15,7 @@ open class PaymentView: UIView, WKNavigationDelegate {
     public var delegate: WebDelegate? = nil
     private var webView: WKWebView!
     private var sOf: ((Bool) -> Void)? = nil
+    private var isFrame = true
     
     private func initWebView(){
         webView = WKWebView(frame: CGRect(x: 0, y: 0, width: frame.width, height: frame.height))
@@ -28,6 +29,7 @@ open class PaymentView: UIView, WKNavigationDelegate {
         if (url.starts(with: "https://api.paybox.money") || url.starts(with:"https://customer.paybox.money")) {
             loadUrl(urlStr: url)
             self.sOf = sucessOrFailure
+            self.isFrame = !url.contains("pay.html")
         }
     }
     
@@ -45,9 +47,17 @@ open class PaymentView: UIView, WKNavigationDelegate {
         }
         if let url = navigationAction.request.url?.absoluteString {
             if url.contains("success") {
+                if(!isFrame) {
+                    self.isHidden = true
+                }
+                
                 self.sOf?(true)
                 webView.loadHTMLString("", baseURL: nil)
             } else if url.contains("failure") {
+                if(!isFrame) {
+                    self.isHidden = true
+                }
+                
                 self.sOf?(false)
                 webView.loadHTMLString("", baseURL: nil)
             }

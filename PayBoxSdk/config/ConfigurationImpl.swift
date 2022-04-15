@@ -23,6 +23,7 @@ class ConfigurationImpl: ConfigurationProtocol {
     private var currencyCode: String = "KZT"
     private let successUrl = "\(Urls.BASE_URL)success"
     private let failureUrl = "\(Urls.BASE_URL)failure"
+    private var isFrameRequired = false
     
     init(merchantId: Int) {
         self.merchantId = merchantId
@@ -92,6 +93,10 @@ class ConfigurationImpl: ConfigurationProtocol {
         self.currencyCode = code
     }
     
+    func setFrameRequired(isRequired: Bool) {
+        self.isFrameRequired = isRequired
+    }
+    
     func defParams() -> [String:String] {
         var params = [String:String]()
         params[Params.MERCHANT_ID] = "\(self.merchantId)"
@@ -122,6 +127,9 @@ class ConfigurationImpl: ConfigurationProtocol {
             params[Params.PAYMENT_SYSTEM] = self.paymentSystem.rawValue
         }
         params[Params.TIMEOUT_AFTER_PAYMENT] = "0"
+        if(self.isFrameRequired) {
+            params[Params.PAYMMENT_ROUTE] = "frame"
+        }
         params[Params.SUCCESS_METHOD] = "GET"
         params[Params.FAILURE_METHOD] = "GET"
         params[Params.SUCCESS_URL] = self.successUrl

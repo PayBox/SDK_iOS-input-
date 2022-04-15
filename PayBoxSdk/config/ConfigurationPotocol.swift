@@ -181,4 +181,15 @@ public protocol ConfigurationProtocol {
     ///     sdk.config().setCurrencyCode(code: "KZT")
     ///
     func setCurrencyCode(code: String)
+    
+    /// Установка кода валюты, в которой указана сумма
+    /// - parameters:
+    ///     - isRequired: требуется ли заменить платежную страницу на frame
+    ///
+    /// Пример кода:
+    /// ----
+    ///
+    ///     sdk.config().setFrameRequired(isRequired: true)
+    ///
+    func setFrameRequired(isRequired: Bool)
 }
