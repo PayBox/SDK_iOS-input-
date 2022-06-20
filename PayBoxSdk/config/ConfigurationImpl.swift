@@ -21,8 +21,6 @@ class ConfigurationImpl: ConfigurationProtocol {
     private var refundUrl: String? = nil
     private var captureUrl: String? = nil
     private var currencyCode: String = "KZT"
-    private let successUrl = "\(Urls.BASE_URL)success"
-    private let failureUrl = "\(Urls.BASE_URL)failure"
     private var isFrameRequired = false
     
     init(merchantId: Int) {
@@ -132,10 +130,10 @@ class ConfigurationImpl: ConfigurationProtocol {
         }
         params[Params.SUCCESS_METHOD] = "GET"
         params[Params.FAILURE_METHOD] = "GET"
-        params[Params.SUCCESS_URL] = self.successUrl
-        params[Params.FAILURE_URL] = self.failureUrl
-        params[Params.BACK_LINK] = self.successUrl
-        params[Params.POST_LINK] = self.successUrl
+        params[Params.SUCCESS_URL] = Urls.SUCCESS_URL
+        params[Params.FAILURE_URL] = Urls.FAILURE_URL
+        params[Params.BACK_LINK] = Urls.SUCCESS_URL
+        params[Params.POST_LINK] = Urls.SUCCESS_URL
         params[Params.LANGUAGE] = self.language.rawValue
         if !(userPhone?.isEmpty ?? true) {
             params[Params.USER_PHONE] = userPhone

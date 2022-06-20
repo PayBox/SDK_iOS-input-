@@ -46,14 +46,14 @@ open class PaymentView: UIView, WKNavigationDelegate {
             decisionHandler(.allow)
         }
         if let url = navigationAction.request.url?.absoluteString {
-            if url.contains("success") {
+            if url.starts(with: Urls.SUCCESS_URL) {
                 if(!isFrame) {
                     self.isHidden = true
                 }
                 
                 self.sOf?(true)
                 webView.loadHTMLString("", baseURL: nil)
-            } else if url.contains("failure") {
+            } else if url.starts(with: Urls.FAILURE_URL) {
                 if(!isFrame) {
                     self.isHidden = true
                 }

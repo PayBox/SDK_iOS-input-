@@ -9,6 +9,8 @@ class Urls {
     static let CANCEL_URL = BASE_URL + "cancel.php"
     static let CLEARING_URL = BASE_URL + "do_capture.php"
     static let RECURRING_URL = BASE_URL + "make_recurring_payment.php"
+    static let SUCCESS_URL = "\(BASE_URL)success"
+    static let FAILURE_URL = "\(BASE_URL)failure"
     static let CARDSTORAGE = "/cardstorage/"
     static let CARD = "/card/"
     static let LISTCARD_URL = "list"
