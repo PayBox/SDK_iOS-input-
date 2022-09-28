@@ -110,17 +110,21 @@ class ConfigurationImpl: ConfigurationProtocol {
         if let extra = extraParams {
             params = extra
         }
+      
+        if(recurringMode) {
+          params[Params.RECURRING_START] = self.recurringMode.stringValue()
+          if(self.recurringLifetime > 0) {
+              params[Params.RECURRING_LIFETIME] = "\(self.recurringLifetime)"
+          }
+        }
+      
         params[Params.MERCHANT_ID] = "\(self.merchantId)"
         params[Params.TEST_MODE] = self.testMode.stringValue()
-        params[Params.RECURRING_START] = self.recurringMode.stringValue()
         params[Params.AUTOCLEARING] = self.autoClearing.stringValue()
         params[Params.REQUEST_METHOD] = self.requestMethod.rawValue
         params[Params.CURRENCY] = self.currencyCode
         params[Params.LIFETIME] = "\(self.paymentLifetime)"
         params[Params.ENCODING] = self.encoding
-        if(self.recurringLifetime > 0) {
-            params[Params.RECURRING_LIFETIME] = "\(self.recurringLifetime)"
-        }
         if (self.paymentSystem != .NONE) {
             params[Params.PAYMENT_SYSTEM] = self.paymentSystem.rawValue
         }
