@@ -2,7 +2,7 @@
 import Foundation
 
 class Urls {
-    static let BASE_URL = "https://api.paybox.money/"
+    static let BASE_URL = "https://api.freedompay.money/"
     static let STATUS_URL = BASE_URL + "get_status.php"
     static let INIT_PAYMENT_URL = BASE_URL + "init_payment.php"
     static let REVOKE_URL = BASE_URL + "revoke.php"
