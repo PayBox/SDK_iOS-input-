@@ -26,11 +26,9 @@ open class PaymentView: UIView, WKNavigationDelegate {
     }
     
     func loadPaymentPage(url: String, sucessOrFailure: @escaping (Bool) -> Void) {
-        if (url.starts(with: "https://api.paybox.money") || url.starts(with:"https://customer.paybox.money")) {
-            loadUrl(urlStr: url)
-            self.sOf = sucessOrFailure
-            self.isFrame = !url.contains("pay.html")
-        }
+        loadUrl(urlStr: url)
+        self.sOf = sucessOrFailure
+        self.isFrame = !url.contains("pay.html")
     }
     
     private func loadUrl(urlStr: String) {
