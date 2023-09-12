@@ -9,6 +9,8 @@ public struct Error {
 public struct Payment {
     public var status: String?
     public let paymentId: Int?
+    public let merchantId: String?
+    public let orderId: String?
     public let redirectUrl: String?
 }
 public struct RecurringPayment {
@@ -30,6 +32,7 @@ public struct Card {
     public let status: String?
     public let merchantId: String?
     public let cardId: String?
+    public let cardToken: String?
     public let recurringProfile: String?
     public let cardhash: String?
     public let date: String?

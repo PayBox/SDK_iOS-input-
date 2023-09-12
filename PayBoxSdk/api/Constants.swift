@@ -2,7 +2,8 @@
 import Foundation
 
 class Urls {
-    static let BASE_URL = "https://api.paybox.money/"
+    static let BASE_URL = "https://api.freedompay.money/"
+    static let CUSTOMER_URL = "https://customer.freedompay.money"
     static let STATUS_URL = BASE_URL + "get_status.php"
     static let INIT_PAYMENT_URL = BASE_URL + "init_payment.php"
     static let REVOKE_URL = BASE_URL + "revoke.php"
@@ -16,13 +17,17 @@ class Urls {
     static let LISTCARD_URL = "list"
     static let CARDINITPAY = "init"
     static let ADDCARD_URL = "add"
+    static let DIRECT = "direct"
     static let PAY = "pay"
     static let REMOVECARD_URL = "remove"
     
-    static func CARD_PAY(merchant_id: Int) -> String {
+    static func nonAcceptanceDirect(merchant_id: Int) -> String {
+        return BASE_URL + "v1/merchant/\(merchant_id)" + CARD + DIRECT
+    }
+    static func cardPay(merchant_id: Int) -> String {
         return BASE_URL + "v1/merchant/\(merchant_id)" + CARD
     }
-    static func CARD_MERCHANT(merchant_id: Int) -> String {
+    static func cardMerchant(merchant_id: Int) -> String {
         return BASE_URL + "v1/merchant/\(merchant_id)" + CARDSTORAGE
     }
 }
@@ -51,6 +56,7 @@ class Params {
     static let SALT = "pg_salt"
     static let STATUS = "pg_status"
     static let CARD_ID = "pg_card_id"
+    static let CARD_TOKEN = "pg_card_token"
     static let CARD_HASH = "pg_card_hash"
     static let TEST_MODE = "pg_testing_mode"
     static let RECURRING_START = "pg_recurring_start"
