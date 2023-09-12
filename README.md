@@ -2,6 +2,10 @@
 
 PayBox SDK iOS - это библиотека позволяющая упростить взаимодействие с API PayBox.
 
+[Исходный код демонстрационного приложения](https://github.com/PayBox/sample-ios-swift-sdk)
+
+<img src="https://github.com/PayBox/sample-ios-swift-sdk/raw/master/swift_init_pay.gif" width="25%" height="25%"/>
+
 **Описание возможностей:**
 
 - Инициализация платежа
@@ -13,7 +17,7 @@ PayBox SDK iOS - это библиотека позволяющая упрост
 - Добавление карт/Удаление карт
 - Оплата добавленными картами
 
-**Установка:**
+# **Установка:**
 
 1. Чтобы интегрировать "PayBoxSdk"; в проект Xcode с использованием "Cocoapods", добавьте в "Podfile":
 ```
@@ -26,8 +30,8 @@ PayBox SDK iOS - это библиотека позволяющая упрост
         $ pod install
 ```
 
-**Работа с SDK**
 
+# Для связи с SDK
 *Инициализация SDK:*
 
 ```
@@ -37,7 +41,7 @@ PayBox SDK iOS - это библиотека позволяющая упрост
 Добавьте PaymentView в ваш UIViewController:
 
 ```
-    @IBOutlet weak var paymentView: PaymentView!
+    let paymentView = PaymentView(frame: CGRect(x: 0, y: 0, width: width, height: height))
 ```
 
 Передайте экземпляр paymentView в sdk:
@@ -57,90 +61,7 @@ PayBox SDK iOS - это библиотека позволяющая упрост
 
     }
 ```
-
-*Создание платежа:*
-
-```
-    sdk.createPayment(amount: amount, description: "description", orderId: "orderId", userId: userId, extraParams: extra) {
-            payment, error in   //Вызовется после оплаты
-    }
-```
-После вызова в paymentView откроется платежная страница
-
-
-*Рекурентный платеж:*
-```
-    sdk.createRecurringPayment(amount: amount, description: "description", recurringProfile: "profile", orderId: "orderId", extraParams: extra) {
-            recurringPayment, error in // Вызовется после оплаты
-    }
-```
-
-*Получение статуса платежа:*
-```
-    sdk.getPaymentStatus(paymentId: paymentId) {
-            status, error in // Вызовется после получения ответа
-    }
-```
-
-*Клиринг платежа:*
-```
-    sdk.makeClearingPayment(paymentId: paymentId, amount: amount) {  // Если указать nil вместо суммы клиринга, то клиринг пройдет на всю сумму платежа
-            capture, error in // Вызовется после клиринга
-    }
-```
-
-*Отмена платежа:*
-```
-    sdk.makeCancelPayment(paymentId: paymentId) {
-            payment, error in // Вызовется после отмены
-    }
-```
-
-*Возврат платежа:*
-```
-    sdk.makeRevokePayment(paymentId: paymentId, amount: amount) {
-            payment, error in // Вызовется после возврата
-    }
-```
-
-*Сохранение карты:*
-```
-    sdk.addNewCard(postLink: "url", userId: userId) {
-            payment, error in // Вызовется после сохранения
-    }
-```
-После вызова в paymentView откроется платежная страница
-
-*Получить список сохраненых карт:*
-```
-    sdk.getAddedCards(userId: userId) {
-            cards, error in // Вызовется после получения ответа
-    }
-```
-
-*Удаление сохраненой карты:*
-```
-    sdk.removeAddedCard(cardId: 123123, userId: 229) {
-            payment, error in // Вызовется после ответа
-    }
-```
-
-*Создание платежа сохраненой картой:*
-```
-    sdk.createCardPayment(amount: 100, userId: 229, cardId: 123123, description: "description", orderId: "01234", extraParams: nil) {
-            payment, error in // Вызовется после создания
-    }
-```
-Для оплаты созданного платежа:
-```
-    sdk.payByCard(paymentId: 2331231) {
-            payment, error in // Вызовется после оплаты
-    }
-```
-После вызова в paymentView откроется платежная страница для 3ds аутентификации
-
-
-**Настройки SDK**
+# **Настройки SDK**
 
 *Тестовый режим:*
 ```
@@ -169,7 +90,7 @@ PayBox SDK iOS - это библиотека позволяющая упрост
 
 *Время жизни рекурентного профиля:*
 ```
-    sdk.config().setRecurringLifetime(lifetime: 36) //по умолчанию 36 месяцев
+    sdk.config().setRecurringLifetime(lifetime: 36) //по умолчанию 0 месяцев (параметр исключается из списка при значении 0)
 ```
 
 *Время жизни платежной страницы, в течение которого платеж должен быть завершен:*
@@ -205,3 +126,93 @@ PayBox SDK iOS - это библиотека позволяющая упрост
     sdk.config().setClearingUrl(url: "url")
     sdk.config().setRequestMethod(requestMethod: requestMethod)
 ```
+
+*Для отображения Frame вместо платежной страницы:*
+```
+    sdk.config().setFrameRequired(isRequired: true) //false по умолчанию
+```
+        
+
+# **Работа с SDK**
+
+## *Создание платежа:*
+
+```
+    sdk.createPayment(amount: amount, description: "description", orderId: "orderId", userId: userId, extraParams: extra) {
+            payment, error in   //Вызовется после оплаты
+    }
+```
+После вызова в paymentView откроется платежная страница
+
+
+## *Рекурентный платеж:*
+```
+    sdk.createRecurringPayment(amount: amount, description: "description", recurringProfile: "profile", orderId: "orderId", extraParams: extra) {
+            recurringPayment, error in // Вызовется после оплаты
+    }
+```
+
+## *Получение статуса платежа:*
+```
+    sdk.getPaymentStatus(paymentId: paymentId) {
+            status, error in // Вызовется после получения ответа
+    }
+```
+
+## *Клиринг платежа:*
+```
+    sdk.makeClearingPayment(paymentId: paymentId, amount: amount) {  // Если указать nil вместо суммы клиринга, то клиринг пройдет на всю сумму платежа
+            capture, error in // Вызовется после клиринга
+    }
+```
+
+## *Отмена платежа:*
+```
+    sdk.makeCancelPayment(paymentId: paymentId) {
+            payment, error in // Вызовется после отмены
+    }
+```
+
+## *Возврат платежа:*
+```
+    sdk.makeRevokePayment(paymentId: paymentId, amount: amount) {
+            payment, error in // Вызовется после возврата
+    }
+```
+
+## *Сохранение карты:*
+```
+    sdk.addNewCard(postLink: "url", userId: userId) {
+            payment, error in // Вызовется после сохранения
+    }
+```
+После вызова в paymentView откроется платежная страница
+
+## *Получить список сохраненых карт:*
+```
+    sdk.getAddedCards(userId: userId) {
+            cards, error in // Вызовется после получения ответа
+    }
+```
+
+## *Удаление сохраненой карты:*
+```
+    sdk.removeAddedCard(cardId: 123123, userId: 229) {
+            payment, error in // Вызовется после ответа
+    }
+```
+
+## *Создание платежа сохраненой картой:*
+```
+    sdk.createCardPayment(amount: 100, userId: 229, cardId: 123123, description: "description", orderId: "01234", extraParams: nil) {
+            payment, error in // Вызовется после создания
+    }
+```
+
+## *Для оплаты созданного платежа:*
+```
+    sdk.payByCard(paymentId: 2331231) {
+            payment, error in // Вызовется после оплаты
+    }
+```
+После вызова в paymentView откроется платежная страница для 3ds аутентификации

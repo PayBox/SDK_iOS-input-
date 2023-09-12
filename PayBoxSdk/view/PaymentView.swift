@@ -2,12 +2,20 @@
 import WebKit
 open class PaymentView: UIView, WKNavigationDelegate {
     
-    open override func awakeFromNib() {
-        initWebView()
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        self.initWebView()
     }
+    
+    required public init?(coder: NSCoder) {
+        super.init(coder: coder)
+        self.initWebView()
+    }
+    
     public var delegate: WebDelegate? = nil
     private var webView: WKWebView!
     private var sOf: ((Bool) -> Void)? = nil
+    private var isFrame = true
     
     private func initWebView(){
         webView = WKWebView(frame: CGRect(x: 0, y: 0, width: frame.width, height: frame.height))
@@ -21,6 +29,7 @@ open class PaymentView: UIView, WKNavigationDelegate {
         if (url.starts(with: "https://api.paybox.money") || url.starts(with:"https://customer.paybox.money")) {
             loadUrl(urlStr: url)
             self.sOf = sucessOrFailure
+            self.isFrame = !url.contains("pay.html")
         }
     }
     
@@ -37,10 +46,18 @@ open class PaymentView: UIView, WKNavigationDelegate {
             decisionHandler(.allow)
         }
         if let url = navigationAction.request.url?.absoluteString {
-            if url.contains("success") {
+            if url.starts(with: Urls.SUCCESS_URL) {
+                if(!isFrame) {
+                    self.isHidden = true
+                }
+                
                 self.sOf?(true)
                 webView.loadHTMLString("", baseURL: nil)
-            } else if url.contains("failure") {
+            } else if url.starts(with: Urls.FAILURE_URL) {
+                if(!isFrame) {
+                    self.isHidden = true
+                }
+                
                 self.sOf?(false)
                 webView.loadHTMLString("", baseURL: nil)
             }

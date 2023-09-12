@@ -86,6 +86,7 @@ public enum PaymentSystem: String {
     case KASSA24
     case P2PKKB
     case EPAYWEBKZT
+    case NONE
 }
 
 public enum RequestMethod: String {

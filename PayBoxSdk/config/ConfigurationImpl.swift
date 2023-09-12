@@ -8,21 +8,20 @@ class ConfigurationImpl: ConfigurationProtocol {
     private var userPhone: String? = nil
     private var userEmail: String? = nil
     private var testMode = true
-    private var paymentSystem = PaymentSystem.EPAYWEBKZT
+    private var paymentSystem = PaymentSystem.NONE
     private var requestMethod = RequestMethod.POST
     private var language = Language.ru
     private var autoClearing = false
     private var encoding = "UTF-8"
     private var paymentLifetime = 300
-    private var recurringLifetime = 36
+    private var recurringLifetime = 0
     private var recurringMode = false
     private var checkUrl: String? = nil
     private var resultUrl: String? = "https://paybox.kz"
     private var refundUrl: String? = nil
     private var captureUrl: String? = nil
     private var currencyCode: String = "KZT"
-    private let successUrl = "\(Urls.BASE_URL)success"
-    private let failureUrl = "\(Urls.BASE_URL)failure"
+    private var isFrameRequired = false
     
     init(merchantId: Int) {
         self.merchantId = merchantId
@@ -92,11 +91,17 @@ class ConfigurationImpl: ConfigurationProtocol {
         self.currencyCode = code
     }
     
+    func setFrameRequired(isRequired: Bool) {
+        self.isFrameRequired = isRequired
+    }
+    
     func defParams() -> [String:String] {
         var params = [String:String]()
         params[Params.MERCHANT_ID] = "\(self.merchantId)"
         params[Params.TEST_MODE] = self.testMode.stringValue()
-        params[Params.PAYMENT_SYSTEM] = self.paymentSystem.rawValue
+        if (self.paymentSystem != .NONE) {
+            params[Params.PAYMENT_SYSTEM] = self.paymentSystem.rawValue
+        }
         return params
     }
     
@@ -113,14 +118,22 @@ class ConfigurationImpl: ConfigurationProtocol {
         params[Params.CURRENCY] = self.currencyCode
         params[Params.LIFETIME] = "\(self.paymentLifetime)"
         params[Params.ENCODING] = self.encoding
-        params[Params.RECURRING_LIFETIME] = "\(self.recurringLifetime)"
-        params[Params.PAYMENT_SYSTEM] = self.paymentSystem.rawValue
+        if(self.recurringLifetime > 0) {
+            params[Params.RECURRING_LIFETIME] = "\(self.recurringLifetime)"
+        }
+        if (self.paymentSystem != .NONE) {
+            params[Params.PAYMENT_SYSTEM] = self.paymentSystem.rawValue
+        }
+        params[Params.TIMEOUT_AFTER_PAYMENT] = "0"
+        if(self.isFrameRequired) {
+            params[Params.PAYMMENT_ROUTE] = "frame"
+        }
         params[Params.SUCCESS_METHOD] = "GET"
         params[Params.FAILURE_METHOD] = "GET"
-        params[Params.SUCCESS_URL] = self.successUrl
-        params[Params.FAILURE_URL] = self.failureUrl
-        params[Params.BACK_LINK] = self.successUrl
-        params[Params.POST_LINK] = self.successUrl
+        params[Params.SUCCESS_URL] = Urls.SUCCESS_URL
+        params[Params.FAILURE_URL] = Urls.FAILURE_URL
+        params[Params.BACK_LINK] = Urls.SUCCESS_URL
+        params[Params.POST_LINK] = Urls.SUCCESS_URL
         params[Params.LANGUAGE] = self.language.rawValue
         if !(userPhone?.isEmpty ?? true) {
             params[Params.USER_PHONE] = userPhone

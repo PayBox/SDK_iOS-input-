@@ -9,6 +9,8 @@ class Urls {
     static let CANCEL_URL = BASE_URL + "cancel.php"
     static let CLEARING_URL = BASE_URL + "do_capture.php"
     static let RECURRING_URL = BASE_URL + "make_recurring_payment.php"
+    static let SUCCESS_URL = "\(BASE_URL)success"
+    static let FAILURE_URL = "\(BASE_URL)failure"
     static let CARDSTORAGE = "/cardstorage/"
     static let CARD = "/card/"
     static let LISTCARD_URL = "list"
@@ -79,4 +81,6 @@ class Params {
     static let RECURRING_PROFILE = "pg_recurring_profile"
     static let AMOUNT = "pg_amount"
     static let PAYMENT_ID = "pg_payment_id"
+    static let TIMEOUT_AFTER_PAYMENT = "pg_timeout_after_payment"
+    static let PAYMMENT_ROUTE = "pg_payment_route"
 }
