@@ -68,6 +68,18 @@ PayBox SDK iOS - это библиотека позволяющая упрост
     sdk.config().testMode(enabled: true) // По умолчанию тестовый режим включен
 ```
 
+*Выбор региона:*
+```
+    sdk.config().setRegion(region: .DEFAULT) //Region.DEAFAULT по умолчанию
+```
+Класс `Region` имеет следующие значения:
+
+| Параметр   | Значение                              |
+|------------|---------------------------------------|
+| `DEAFAULT` | Казахстан и другие страны присутствия |
+| `RU`       | Россия                                |
+| `UZ`       | Узбекистан                            |
+
 *Выбор платежной системы:*
 ```
     sdk.config().setPaymentSystem(paymentSystem: paymentSystem)
