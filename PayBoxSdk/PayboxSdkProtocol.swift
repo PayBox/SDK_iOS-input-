@@ -45,6 +45,20 @@ public protocol PayboxSdkProtocol {
     ///
     func createRecurringPayment(amount: Float, description: String, recurringProfile: String, orderId: String?, extraParams:  [String:String]?, recurringPaid: @escaping (RecurringPayment?, Error?)->Void)
     
+    /// Проведение безакцептного списания
+    /// - parameters:
+    ///     - paymentId: ID платежа в системе Paybox
+    ///     - paymentPaid: callback от Api Paybox
+    ///
+    /// Пример кода:
+    /// ----
+    ///
+    ///     sdk.createNonAcceptancePayment(paymentId: 2331231) {
+    ///             payment, error in // Вызовется после оплаты
+    ///     }
+    ///
+    func createNonAcceptancePayment(paymentId: Int, paymentPaid: @escaping (Payment?, Error?) -> Void)
+    
     /// Создание платежа добавленной картой
     /// - parameters:
     ///     - amount: сумма платежа
@@ -62,7 +76,27 @@ public protocol PayboxSdkProtocol {
     ///             payment, error in // Вызовется после создания
     ///     }
     ///
+    @available(*, deprecated, message: "Use createCardPayment(amount:userId:cardToken:description:orderId:extraParams:payInited:) instead")
     func createCardPayment(amount: Float, userId: String, cardId: Int, description: String, orderId: String, extraParams: [String:String]?, payInited: @escaping (Payment?, Error?)->Void)
+    
+    /// Создание платежа токенизированной картой
+    /// - parameters:
+    ///     - amount: сумма платежа
+    ///     - description: комментарии, описание платежа
+    ///     - orderId: ID заказа платежа
+    ///     - userId: ID пользователя в системе мерчанта
+    ///     - cardToken: Токен сохраненной карты в системе Paybox
+    ///     - extraParams: доп. параметры мерчанта
+    ///     - payInited: callback от Api Paybox
+    ///
+    /// Пример кода:
+    /// ----
+    ///
+    ///     sdk.createCardPayment(amount: 100, userId: "229", cardToken: "abcdefghjk", description: "description", orderId: "01234", extraParams: nil) {
+    ///             payment, error in // Вызовется после создания
+    ///     }
+    ///
+    func createCardPayment(amount: Float, userId: String, cardToken: String, description: String, orderId: String, extraParams: [String:String]?, payInited: @escaping (Payment?, Error?)->Void)
     
     /// Оплата созданного платежа, добавленной картой
     /// - parameters:

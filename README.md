@@ -68,6 +68,18 @@ PayBox SDK iOS - это библиотека позволяющая упрост
     sdk.config().testMode(enabled: true) // По умолчанию тестовый режим включен
 ```
 
+*Выбор региона:*
+```
+    sdk.config().setRegion(region: .DEFAULT) //Region.DEAFAULT по умолчанию
+```
+Класс `Region` имеет следующие значения:
+
+| Параметр   | Значение                              |
+|------------|---------------------------------------|
+| `DEAFAULT` | Казахстан и другие страны присутствия |
+| `RU`       | Россия                                |
+| `UZ`       | Узбекистан                            |
+
 *Выбор платежной системы:*
 ```
     sdk.config().setPaymentSystem(paymentSystem: paymentSystem)
@@ -105,12 +117,12 @@ PayBox SDK iOS - это библиотека позволяющая упрост
 
 *Номер телефона клиента, будет отображаться на платежной странице. Если не указать, то будет предложено ввести на платежной странице:*
 ```
-    sdk.config().setUserPhone(userPhone: "userPhone")
+    sdk.config().setUserPhone(userPhone: userPhone)
 ```
 
 *Email клиента, будет отображаться на платежной странице. Если не указать email, то будет предложено ввести на платежной странице:*
 ```
-    sdk.config().setUserEmail(userEmail: "email")
+    sdk.config().setUserEmail(userEmail: email)
 ```
 
 *Язык платежной страницы:*
@@ -120,10 +132,10 @@ PayBox SDK iOS - это библиотека позволяющая упрост
 
 *Для передачи информации от платежного гейта:*
 ```
-    sdk.config().setCheckUrl(url: "url")
-    sdk.config().setResultUrl(url: "url")
-    sdk.config().setRefundUrl(url: "url")
-    sdk.config().setClearingUrl(url: "url")
+    sdk.config().setCheckUrl(url: url)
+    sdk.config().setResultUrl(url: url)
+    sdk.config().setRefundUrl(url: url)
+    sdk.config().setClearingUrl(url: url)
     sdk.config().setRequestMethod(requestMethod: requestMethod)
 ```
 
@@ -182,7 +194,7 @@ PayBox SDK iOS - это библиотека позволяющая упрост
 
 ## *Сохранение карты:*
 ```
-    sdk.addNewCard(postLink: "url", userId: userId) {
+    sdk.addNewCard(postLink: url, userId: userId) {
             payment, error in // Вызовется после сохранения
     }
 ```
@@ -197,22 +209,29 @@ PayBox SDK iOS - это библиотека позволяющая упрост
 
 ## *Удаление сохраненой карты:*
 ```
-    sdk.removeAddedCard(cardId: 123123, userId: 229) {
+    sdk.removeAddedCard(cardId: cardId, userId: userId) {
             payment, error in // Вызовется после ответа
     }
 ```
 
 ## *Создание платежа сохраненой картой:*
 ```
-    sdk.createCardPayment(amount: 100, userId: 229, cardId: 123123, description: "description", orderId: "01234", extraParams: nil) {
+    sdk.createCardPayment(amount: amount, userId: userId, cardToken: "cardToken", description: "description", orderId: "01234", extraParams: nil) {
             payment, error in // Вызовется после создания
     }
 ```
-
+> *Внимание: Метод `createCardPayment` с использованием `cardId` является устаревшим.*
 ## *Для оплаты созданного платежа:*
 ```
-    sdk.payByCard(paymentId: 2331231) {
+    sdk.payByCard(paymentId: paymentId) {
             payment, error in // Вызовется после оплаты
     }
 ```
 После вызова в paymentView откроется платежная страница для 3ds аутентификации
+
+## *Для оплаты созданного платежа c безакцепным списанием:*
+```
+   sdk.createNonAcceptancePayment(paymentId: paymentId){
+            payment, error -> //Вызовется после оплаты
+   }
+```

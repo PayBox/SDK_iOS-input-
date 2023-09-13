@@ -2,28 +2,87 @@
 import Foundation
 
 class Urls {
-    static let BASE_URL = "https://api.paybox.money/"
-    static let STATUS_URL = BASE_URL + "get_status.php"
-    static let INIT_PAYMENT_URL = BASE_URL + "init_payment.php"
-    static let REVOKE_URL = BASE_URL + "revoke.php"
-    static let CANCEL_URL = BASE_URL + "cancel.php"
-    static let CLEARING_URL = BASE_URL + "do_capture.php"
-    static let RECURRING_URL = BASE_URL + "make_recurring_payment.php"
-    static let SUCCESS_URL = "\(BASE_URL)success"
-    static let FAILURE_URL = "\(BASE_URL)failure"
+    static let DEFAULT_FREEDOM_URL = "https://api.freedompay.money/"
+    static let RU_PAYBOX_URL = "https://api.paybox.ru/"
+    static let UZ_FREEDOM_URL = "https://api.freedompay.uz/"
+    static let CUSTOMER_DEFAULT_URL = "https://customer.freedompay.money"
+    static let CUSTOMER_RU_URL = "https://customer.paybox.ru"
+    static let CUSTOMER_UZ_URL = "https://customer.freedompay.uz"
     static let CARDSTORAGE = "/cardstorage/"
     static let CARD = "/card/"
     static let LISTCARD_URL = "list"
     static let CARDINITPAY = "init"
     static let ADDCARD_URL = "add"
+    static let DIRECT = "direct"
     static let PAY = "pay"
     static let REMOVECARD_URL = "remove"
     
-    static func CARD_PAY(merchant_id: Int) -> String {
-        return BASE_URL + "v1/merchant/\(merchant_id)" + CARD
+    static var region: Region = .DEFAULT
+    
+    static func getBaseUrl() -> String {
+        switch region {
+        case .DEFAULT:
+            return DEFAULT_FREEDOM_URL
+        case .RU:
+            return RU_PAYBOX_URL
+        case .UZ:
+            return UZ_FREEDOM_URL
+        }
     }
-    static func CARD_MERCHANT(merchant_id: Int) -> String {
-        return BASE_URL + "v1/merchant/\(merchant_id)" + CARDSTORAGE
+    
+    static func getCustomerUrl() -> String {
+        switch region {
+        case .DEFAULT:
+            return CUSTOMER_DEFAULT_URL
+        case .RU:
+            return CUSTOMER_RU_URL
+        case .UZ:
+            return CUSTOMER_UZ_URL
+        }
+    }
+    
+    static func statusUrl() -> String {
+        return getBaseUrl() + "get_status.php"
+    }
+    
+    static func initPaymentUrl() -> String {
+        return getBaseUrl() + "init_payment.php"
+    }
+    
+    static func revokeUrl() -> String {
+        return getBaseUrl() + "revoke.php"
+    }
+    
+    static func cancelUrl() -> String {
+        return getBaseUrl() + "cancel.php"
+    }
+    
+    static func clearingUrl() -> String {
+        return getBaseUrl() + "do_capture.php"
+    }
+    
+    static func recurringUrl() -> String {
+        return getBaseUrl() + "make_recurring_payment.php"
+    }
+    
+    static func successUrl() -> String {
+        return getBaseUrl() + "success"
+    }
+    
+    static func failureUrl() -> String {
+        return getBaseUrl() + "failure"
+    }
+    
+    static func nonAcceptanceDirect(merchant_id: Int) -> String {
+        return getBaseUrl() + "v1/merchant/\(merchant_id)" + CARD + DIRECT
+    }
+    
+    static func cardPay(merchant_id: Int) -> String {
+        return getBaseUrl() + "v1/merchant/\(merchant_id)" + CARD
+    }
+    
+    static func cardMerchant(merchant_id: Int) -> String {
+        return getBaseUrl() + "v1/merchant/\(merchant_id)" + CARDSTORAGE
     }
 }
 
@@ -51,6 +110,7 @@ class Params {
     static let SALT = "pg_salt"
     static let STATUS = "pg_status"
     static let CARD_ID = "pg_card_id"
+    static let CARD_TOKEN = "pg_card_token"
     static let CARD_HASH = "pg_card_hash"
     static let TEST_MODE = "pg_testing_mode"
     static let RECURRING_START = "pg_recurring_start"

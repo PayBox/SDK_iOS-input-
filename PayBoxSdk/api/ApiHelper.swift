@@ -78,11 +78,7 @@ extension ApiHelper {
                     if isSuccess(xml: result.response) {
                         apiHandler(url: result.url, xml: result.response, error: nil)
                     } else {
-                        let code = result.response.getIntValue(key: Params.ERROR_CODE)
-                        let description = result.response.getStringValue(key: Params.ERROR_DESCRIPTION)
-                        apiHandler(url: result.url, xml: nil, error: Error(
-                            errorCode: code ?? 520,
-                            description: description ?? Params.UNKNOWN_ERROR))
+                        handleError(data: result)
                     }
                 } else {
                     apiHandler(url: result.url, xml: nil, error: Error(
@@ -90,27 +86,39 @@ extension ApiHelper {
                         description: Params.FORMAT_ERROR))
                 }
             } else {
-                apiHandler(url: result.url, xml: nil, error: Error(
-                    errorCode: result.code,
-                    description: result.response))
+                if result.response.contains(Params.RESPONSE) {
+                    handleError(data: result)
+                } else {
+                    apiHandler(url: result.url, xml: nil, error: Error(
+                        errorCode: result.code,
+                        description: result.response))
+                }
             }
         }
     }
     
+    private func handleError(data: ResponseData) {
+        let code = data.response.getIntValue(key: Params.ERROR_CODE)
+        let description = data.response.getStringValue(key: Params.ERROR_DESCRIPTION)
+        apiHandler(url: data.url, xml: nil, error: Error(
+            errorCode: code ?? 520,
+            description: description ?? Params.UNKNOWN_ERROR))
+    }
+    
     private func apiHandler(url: String, xml: String?, error: Error?) {
-        if url.contains(Urls.INIT_PAYMENT_URL) {
+        if url.contains(Urls.initPaymentUrl()) {
             self.listener?.onPaymentInited(payment: xml?.getPayment(), error: error)
-        } else if url.contains(Urls.REVOKE_URL) {
+        } else if url.contains(Urls.revokeUrl()) {
             self.listener?.onPaymentRevoked(payment: xml?.getPayment(), error: error)
-        } else if url.contains(Urls.CANCEL_URL) {
+        } else if url.contains(Urls.cancelUrl()) {
             self.listener?.onPaymentCanceled(payment: xml?.getPayment(), error: error)
-        } else if url.contains(Urls.REVOKE_URL) {
+        } else if url.contains(Urls.revokeUrl()) {
             self.listener?.onPaymentRevoked(payment: xml?.getPayment(), error: error)
-        } else if url.contains(Urls.CLEARING_URL) {
+        } else if url.contains(Urls.clearingUrl()) {
             self.listener?.onCapture(capture: xml?.getCapture(), error: error)
-        } else if url.contains(Urls.STATUS_URL) {
+        } else if url.contains(Urls.statusUrl()) {
             self.listener?.onPaymentStatus(status: xml?.getStatus(), error: error)
-        } else if url.contains(Urls.RECURRING_URL) {
+        } else if url.contains(Urls.recurringUrl()) {
             self.listener?.onPaymentRecurring(recurringPayment: xml?.getRecurringPayment(), error: error)
         } else if url.contains(Urls.CARDSTORAGE + Urls.ADDCARD_URL) {
             self.listener?.onCardAdding(payment: xml?.getPayment(), error: error)
@@ -120,6 +128,8 @@ extension ApiHelper {
             self.listener?.onCardRemoved(card: xml?.getCard(), error: error)
         } else if url.contains(Urls.CARD + Urls.CARDINITPAY) {
             self.listener?.onCardPayInited(payment: xml?.getPayment(), error: error)
+        } else if url.contains(Urls.CARD + Urls.DIRECT) {
+            self.listener?.onNonAcceptanceDirected(payment: xml?.getPayment(), error: error)
         }
     }
     
@@ -142,6 +152,8 @@ extension String {
         return Payment(
             status: self.getStringValue(key: Params.STATUS),
             paymentId: self.getIntValue(key: Params.PAYMENT_ID),
+            merchantId: self.getStringValue(key: Params.MERCHANT_ID),
+            orderId: self.getStringValue(key: Params.ORDER_ID),
             redirectUrl: self.getStringValue(key: Params.REDIRECT_URL))
     }
     
@@ -160,6 +172,7 @@ extension String {
             status: self.getStringValue(key: Params.STATUS),
             merchantId: self.getStringValue(key: Params.MERCHANT_ID),
             cardId: self.getStringValue(key: Params.CARD_ID),
+            cardToken: self.getStringValue(key: Params.CARD_TOKEN),
             recurringProfile: self.getStringValue(key: Params.RECURRING_PROFILE_ID),
             cardhash: self.getStringValue(key: Params.CARD_HASH),
             date: self.getStringValue(key: Params.CARD_CREATED_AT))

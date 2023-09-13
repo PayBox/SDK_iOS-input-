@@ -26,7 +26,7 @@ open class PaymentView: UIView, WKNavigationDelegate {
     }
     
     func loadPaymentPage(url: String, sucessOrFailure: @escaping (Bool) -> Void) {
-        if (url.starts(with: "https://api.paybox.money") || url.starts(with:"https://customer.paybox.money")) {
+        if (url.starts(with: Urls.getBaseUrl()) || url.starts(with: Urls.getCustomerUrl())) {
             loadUrl(urlStr: url)
             self.sOf = sucessOrFailure
             self.isFrame = !url.contains("pay.html")
@@ -46,14 +46,14 @@ open class PaymentView: UIView, WKNavigationDelegate {
             decisionHandler(.allow)
         }
         if let url = navigationAction.request.url?.absoluteString {
-            if url.starts(with: Urls.SUCCESS_URL) {
+            if url.starts(with: Urls.successUrl()) {
                 if(!isFrame) {
                     self.isHidden = true
                 }
                 
                 self.sOf?(true)
                 webView.loadHTMLString("", baseURL: nil)
-            } else if url.starts(with: Urls.FAILURE_URL) {
+            } else if url.starts(with: Urls.failureUrl()) {
                 if(!isFrame) {
                     self.isHidden = true
                 }
