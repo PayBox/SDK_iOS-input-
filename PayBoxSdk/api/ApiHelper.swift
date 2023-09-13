@@ -106,19 +106,19 @@ extension ApiHelper {
     }
     
     private func apiHandler(url: String, xml: String?, error: Error?) {
-        if url.contains(Urls.INIT_PAYMENT_URL) {
+        if url.contains(Urls.initPaymentUrl()) {
             self.listener?.onPaymentInited(payment: xml?.getPayment(), error: error)
-        } else if url.contains(Urls.REVOKE_URL) {
+        } else if url.contains(Urls.revokeUrl()) {
             self.listener?.onPaymentRevoked(payment: xml?.getPayment(), error: error)
-        } else if url.contains(Urls.CANCEL_URL) {
+        } else if url.contains(Urls.cancelUrl()) {
             self.listener?.onPaymentCanceled(payment: xml?.getPayment(), error: error)
-        } else if url.contains(Urls.REVOKE_URL) {
+        } else if url.contains(Urls.revokeUrl()) {
             self.listener?.onPaymentRevoked(payment: xml?.getPayment(), error: error)
-        } else if url.contains(Urls.CLEARING_URL) {
+        } else if url.contains(Urls.clearingUrl()) {
             self.listener?.onCapture(capture: xml?.getCapture(), error: error)
-        } else if url.contains(Urls.STATUS_URL) {
+        } else if url.contains(Urls.statusUrl()) {
             self.listener?.onPaymentStatus(status: xml?.getStatus(), error: error)
-        } else if url.contains(Urls.RECURRING_URL) {
+        } else if url.contains(Urls.recurringUrl()) {
             self.listener?.onPaymentRecurring(recurringPayment: xml?.getRecurringPayment(), error: error)
         } else if url.contains(Urls.CARDSTORAGE + Urls.ADDCARD_URL) {
             self.listener?.onCardAdding(payment: xml?.getPayment(), error: error)

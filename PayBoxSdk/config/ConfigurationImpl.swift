@@ -22,6 +22,7 @@ class ConfigurationImpl: ConfigurationProtocol {
     private var captureUrl: String? = nil
     private var currencyCode: String = "KZT"
     private var isFrameRequired = false
+    private var region: Region = .DEFAULT
     
     init(merchantId: Int) {
         self.merchantId = merchantId
@@ -95,6 +96,11 @@ class ConfigurationImpl: ConfigurationProtocol {
         self.isFrameRequired = isRequired
     }
     
+    func setRegion(region: Region) {
+        self.region = region
+        Urls.region = region
+    }
+    
     func defParams() -> [String:String] {
         var params = [String:String]()
         params[Params.MERCHANT_ID] = "\(self.merchantId)"
@@ -132,10 +138,10 @@ class ConfigurationImpl: ConfigurationProtocol {
         }
         params[Params.SUCCESS_METHOD] = "GET"
         params[Params.FAILURE_METHOD] = "GET"
-        params[Params.SUCCESS_URL] = Urls.SUCCESS_URL
-        params[Params.FAILURE_URL] = Urls.FAILURE_URL
-        params[Params.BACK_LINK] = Urls.SUCCESS_URL
-        params[Params.POST_LINK] = Urls.SUCCESS_URL
+        params[Params.SUCCESS_URL] = Urls.successUrl()
+        params[Params.FAILURE_URL] = Urls.failureUrl()
+        params[Params.BACK_LINK] = Urls.successUrl()
+        params[Params.POST_LINK] = Urls.successUrl()
         params[Params.LANGUAGE] = self.language.rawValue
         if !(userPhone?.isEmpty ?? true) {
             params[Params.USER_PHONE] = userPhone

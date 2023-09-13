@@ -68,6 +68,12 @@ public enum Language: String {
     case de
 }
 
+public enum Region: String {
+    case DEFAULT
+    case RU
+    case UZ
+}
+
 public enum PaymentSystem: String {
     case KAZPOSTKZT
     case CYBERPLATKZT

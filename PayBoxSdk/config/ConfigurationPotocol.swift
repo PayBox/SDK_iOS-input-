@@ -182,7 +182,7 @@ public protocol ConfigurationProtocol {
     ///
     func setCurrencyCode(code: String)
     
-    /// Установка кода валюты, в которой указана сумма
+    /// Установка требования по отображению фрейма
     /// - parameters:
     ///     - isRequired: требуется ли заменить платежную страницу на frame
     ///
@@ -192,4 +192,15 @@ public protocol ConfigurationProtocol {
     ///     sdk.config().setFrameRequired(isRequired: true)
     ///
     func setFrameRequired(isRequired: Bool)
+    
+    /// Установка региона
+    /// - parameters:
+    ///     - region: выбор региона работы
+    ///
+    /// Пример кода:
+    /// ----
+    ///
+    ///     sdk.config().setRegion(region: .DEFAULT)
+    ///
+    func setRegion(region: Region)
 }

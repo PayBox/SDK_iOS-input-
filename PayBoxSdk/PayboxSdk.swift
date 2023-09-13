@@ -41,7 +41,7 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
         if let userID = userId {
             params[Params.USER_ID] = userID
         }
-        apiHelper.initConnection(url: Urls.INIT_PAYMENT_URL, params: params)
+        apiHelper.initConnection(url: Urls.initPaymentUrl(), params: params)
     }
     
     public func createRecurringPayment(amount: Float, description: String, recurringProfile: String, orderId: String?, extraParams: [String : String]?, recurringPaid: @escaping (RecurringPayment?, Error?) -> Void) {
@@ -53,7 +53,7 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
         params[Params.AMOUNT] = "\(amount)"
         params[Params.DESCRIPTION] = description
         params[Params.RECURRING_PROFILE] = recurringProfile
-        apiHelper.initConnection(url: Urls.RECURRING_URL, params: params)
+        apiHelper.initConnection(url: Urls.recurringUrl(), params: params)
     }
     
     public func createNonAcceptancePayment(paymentId: Int, paymentPaid: @escaping (Payment?, Error?) -> Void) {
@@ -112,7 +112,7 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
         self.paymentStatus = statusReceived
         var params = configs.getParams()
         params[Params.PAYMENT_ID] = "\(paymentId)"
-        apiHelper.initConnection(url: Urls.STATUS_URL, params: params)
+        apiHelper.initConnection(url: Urls.statusUrl(), params: params)
     }
     
     public func makeRevokePayment(paymentId: Int, amount: Float, revoked: @escaping (Payment?, Error?) -> Void) {
@@ -120,7 +120,7 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
         var params = configs.getParams()
         params[Params.PAYMENT_ID] = "\(paymentId)"
         params[Params.REFUND_AMOUNT] = "\(amount)"
-        apiHelper.initConnection(url: Urls.REVOKE_URL, params: params)
+        apiHelper.initConnection(url: Urls.revokeUrl(), params: params)
     }
     
     public func makeClearingPayment(paymentId: Int, amount: Float?, cleared: @escaping (Capture?, Error?) -> Void) {
@@ -130,14 +130,14 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
         if let amount = amount {
             params[Params.CLEARING_AMOUNT] = "\(amount)"
         }
-        apiHelper.initConnection(url: Urls.CLEARING_URL, params: params)
+        apiHelper.initConnection(url: Urls.clearingUrl(), params: params)
     }
     
     public func makeCancelPayment(paymentId: Int, canceled: @escaping (Payment?, Error?) -> Void) {
         self.paymentCancel = canceled
         var params = configs.getParams()
         params[Params.PAYMENT_ID] = "\(paymentId)"
-        apiHelper.initConnection(url: Urls.CANCEL_URL, params: params)
+        apiHelper.initConnection(url: Urls.cancelUrl(), params: params)
     }
     
     public func addNewCard(postLink: String?, userId: String, cardAdded: @escaping (Payment?, Error?) -> Void) {
