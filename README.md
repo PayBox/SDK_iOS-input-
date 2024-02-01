@@ -294,7 +294,7 @@ PayBox SDK iOS - это библиотека позволяющая упрост
     }
 ```
 
-### 4. Добавьте метод для инициализации и подтверждения платежа в SDK:
+### 4. Добавьте метод для инициализации и подтверждения платежа с помощью SDK:
 
 ``` Swift
 func finishApplePayPayment(tokenData: Data, handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {
