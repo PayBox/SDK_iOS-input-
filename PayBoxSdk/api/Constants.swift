@@ -10,6 +10,7 @@ class Urls {
     static let CUSTOMER_UZ_URL = "https://customer.freedompay.uz"
     static let CARDSTORAGE = "/cardstorage/"
     static let CARD = "/card/"
+    static let PAY_ROUTE = "/pay/"
     static let LISTCARD_URL = "list"
     static let CARDINITPAY = "init"
     static let ADDCARD_URL = "add"
@@ -39,6 +40,22 @@ class Urls {
         case .UZ:
             return CUSTOMER_UZ_URL
         }
+    }
+    
+    static func getCustomerDomain() -> String {
+        var domain = ""
+        switch region {
+        case .DEFAULT:
+            domain = CUSTOMER_DEFAULT_URL
+        case .RU:
+            domain = CUSTOMER_RU_URL
+        case .UZ:
+            domain = CUSTOMER_UZ_URL
+        }
+        
+        domain = domain.replacingOccurrences(of: "https://", with: "")
+        
+        return domain
     }
     
     static func statusUrl() -> String {
@@ -84,16 +101,22 @@ class Urls {
     static func cardMerchant(merchant_id: Int) -> String {
         return getBaseUrl() + "v1/merchant/\(merchant_id)" + CARDSTORAGE
     }
+    
+    static func confirmApplePayUrl(paymentId: String) -> String {
+        return getCustomerUrl() + PAY_ROUTE + paymentId + "/" + PAY
+    }
 }
 
 class Params {
     static let RECURRING_PROFILE_ID = "pg_recurring_profile_id"
     static let CARD_CREATED_AT = "created_at"
     static let RESPONSE = "response"
+    static let DATA = "data"
     static let PAYMENT_FAILURE = "Не удалось оплатить"
     static let UNKNOWN_ERROR = "Неизвестная ошибка"
     static let CONNECTION_ERROR = "Ошибка подключения"
     static let FORMAT_ERROR = "Неправильный формат ответа"
+    static let PAYMENT_ERROR = "Ошибка при проведении платежа"
     static let RECURRING_PROFILE_EXPIRY = "pg_recurring_profile_expiry_date"
     static let CLEARING_AMOUNT = "pg_clearing_amount"
     static let REFUND_AMOUNT = "pg_refund_amount"
@@ -143,4 +166,29 @@ class Params {
     static let PAYMENT_ID = "pg_payment_id"
     static let TIMEOUT_AFTER_PAYMENT = "pg_timeout_after_payment"
     static let PAYMMENT_ROUTE = "pg_payment_route"
+    static let APPLE_PAY = "apple_pay"
+    static let TYPE = "type"
+    static let DOMAIN = "domain"
+    static let SDK_DOMAIN = "mobileapp.freedompay.money"
+    static let TOKEN = "token"
+    static let TAG_DATA = "data"
+    static let TAG_HEADER = "header"
+    static let TAG_STATUS = "status"
+    static let STATUS_OK = "ok"
+    static let TAG_BACK_URL = "back_url"
+    static let TAG_URL = "url"
+    static let TAG_PARAMS = "params"
+    static let TAG_CODE = "code"
+    static let TAG_MESSAGE = "message"
+    static let TAG_PAYMENT_DATA = "paymentData"
+    static let TAG_PAYMENT_SIGNATURE = "paymentSignature"
+    static let TAG_PAYMENT_ENCRYPTION = "paymentTransactionEncryption"
+    static let TAG_PAYMENT_PUBLIC_KEY = "paymentEphemeralPublicKey"
+    static let TAG_SIGNATURE = "signature"
+    static let TAG_VERSION = "version"
+    static let TAG_PUBLICK_KEY = "ephemeralPublicKey"
+    static let TAG_PAYMENT_PUBLIC_KEY_HASH = "paymentPublicKeyHash"
+    static let TAG_PAYMENT_TRANSACTION_ID = "paymentTransactionId"
+    static let TAG_PUBLIC_KEY_HASH = "publicKeyHash"
+    static let TAG_TRANSACTION_ID = "transactionId"
 }
