@@ -16,6 +16,38 @@ public protocol PayboxSdkProtocol {
     ///     - orderId: ID заказа платежа
     ///     - userId: ID пользователя в системе мерчанта
     ///     - extraParams: доп. параметры мерчанта
+    ///     - applePaymentInited: callback от Api Paybox
+    ///
+    /// Пример кода:
+    /// ----
+    ///
+    ///     sdk.createApplePayment(amount: 100, description: "description", orderId: "01234", userId: "229", extraParams: nil) {
+    ///             paymentId, error  in // Вызовется после оплаты
+    ///     }
+    ///
+    func createApplePayment(amount: Float, description: String, orderId: String?, userId: String?, extraParams: [String : String]?, applePaymentInited: @escaping (String?, Error?) -> Void)
+
+    /// Оплата созданного платежа, с помощью Apple Pay
+    /// - parameters:
+    ///     - paymentId: идентификатор платежа полученный из запроса на инициализацию платежа 'createApplePayment'
+    ///     - tokenData: токен полученный от Apple Pay (с помощью PassKit)
+    ///
+    /// Пример кода:
+    /// ----
+    ///
+    ///     sdk.confirmApplePayment(url: url, tokenData: tokenData) {
+    ///             payment, error in // Вызовется после оплаты
+    ///     }
+    ///
+    func confirmApplePayment(paymentId: String, tokenData: Data,  paymentPaid: @escaping (Payment?, Error?) -> Void)
+    
+    /// Создание нового платежа
+    /// - parameters:
+    ///     - amount: сумма платежа
+    ///     - description: комментарии, описание платежа
+    ///     - orderId: ID заказа платежа
+    ///     - userId: ID пользователя в системе мерчанта
+    ///     - extraParams: доп. параметры мерчанта
     ///     - paymentPaid: callback от Api Paybox
     ///
     /// Пример кода:

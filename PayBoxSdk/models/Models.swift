@@ -42,6 +42,7 @@ public struct RequestData {
     let params: [(key: String, value: String)]
     let method: RequestMethod
     let url: String
+    let paymentType: String
 }
 
 public struct ResponseData {
@@ -95,6 +96,7 @@ public enum PaymentSystem: String {
     case KASSA24
     case P2PKKB
     case EPAYWEBKZT
+    case WAY4
     case NONE
 }
 

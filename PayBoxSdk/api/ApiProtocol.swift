@@ -14,4 +14,5 @@ protocol ApiProtocol {
     func onCardListing(cards: Array<Card>?, error: Error?)
     func onCardRemoved(card: Card?, error: Error?)
     func onCardPayInited(payment: Payment?, error: Error?)
+    func onApplePayInited(paymentId: String?, error: Error?)
 }

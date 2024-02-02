@@ -8,9 +8,10 @@ open class ApiHelper: SignHelper {
         super.init(secretKey: secretKey)
         self.listener = listener
     }
-    func initConnection(url: String, params: [String:String]) {
+    
+    func initConnection(url: String, params: [String:String], paymentType: String? = nil) {
         request(requestData: {
-            RequestData(params: self.signedParams(url: url, array: params), method: RequestMethod.POST, url: url)
+            RequestData(params: self.signedParams(url: url, array: params), method: RequestMethod.POST, url: url, paymentType: paymentType ?? "")
         })
     }
 }
@@ -21,7 +22,7 @@ extension ApiHelper {
             self.connection(requestData: requestData(), connection: {
                 responseData in
                 DispatchQueue.main.async {
-                    self.resolveResponse(result: responseData)
+                    self.resolveResponse(result: responseData, paymentType: requestData().paymentType)
                 }
             })
             
@@ -46,6 +47,10 @@ extension ApiHelper {
         request.timeoutInterval = 25000
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("application/json", forHTTPHeaderField: "Accept")
+        if requestData.url.contains(Urls.getCustomerUrl() + Urls.PAY_ROUTE) {
+            request.addValue(Urls.getCustomerDomain(), forHTTPHeaderField: "Host")
+            request.addValue(Urls.getCustomerUrl(), forHTTPHeaderField: "Origin")
+        }
         request.httpBody = parameters
         URLSession.shared.dataTask(with: request) {
             data, response, err in
@@ -66,48 +71,75 @@ extension ApiHelper {
                         response: strResponse,
                         url: requestData.url,
                         error: statusCode != 200))
+                } else {
+                    connection(ResponseData(
+                        code: statusCode,
+                        response: String(data: data!, encoding: .utf8)!,
+                        url: requestData.url,
+                        error: true))
                 }
             }
             }.resume()
     }
     
-    private func resolveResponse(result: ResponseData?) {
+    private func resolveResponse(result: ResponseData?, paymentType: String? = nil) {
         if let result = result {
             if !result.error {
                 if result.response.contains(Params.RESPONSE) {
                     if isSuccess(xml: result.response) {
-                        apiHandler(url: result.url, xml: result.response, error: nil)
+                        apiHandler(url: result.url, xml: result.response, error: nil, paymentType: paymentType)
                     } else {
-                        handleError(data: result)
+                        handleError(data: result, paymentType: paymentType)
+                    }
+                } else if result.response.contains(Params.DATA) {
+                    if result.response.isApplePaymentSuccess() {
+                        apiHandler(url: result.url, xml: result.response, error: nil, paymentType: paymentType)
+                    } else {
+                        apiHandler(url: result.url, xml: nil, error: result.response.getApplePaymentError(), paymentType: paymentType)
                     }
                 } else {
-                    apiHandler(url: result.url, xml: nil, error: Error(
+                    apiHandler(url: result.url, xml: result.response, error: Error(
                         errorCode: 0,
-                        description: Params.FORMAT_ERROR))
+                        description: Params.FORMAT_ERROR), paymentType: paymentType)
                 }
             } else {
                 if result.response.contains(Params.RESPONSE) {
-                    handleError(data: result)
+                    handleError(data: result, paymentType: paymentType)
+                } else if result.response.contains(Params.DATA) {
+                    apiHandler(url: result.url, xml: nil, error: result.response.getApplePaymentError(), paymentType: paymentType)
                 } else {
                     apiHandler(url: result.url, xml: nil, error: Error(
                         errorCode: result.code,
-                        description: result.response))
+                        description: result.response), paymentType: paymentType)
                 }
             }
         }
     }
     
-    private func handleError(data: ResponseData) {
+    private func handleError(data: ResponseData, paymentType: String? = nil) {
         let code = data.response.getIntValue(key: Params.ERROR_CODE)
         let description = data.response.getStringValue(key: Params.ERROR_DESCRIPTION)
         apiHandler(url: data.url, xml: nil, error: Error(
             errorCode: code ?? 520,
-            description: description ?? Params.UNKNOWN_ERROR))
+            description: description ?? Params.UNKNOWN_ERROR), paymentType: paymentType)
     }
     
-    private func apiHandler(url: String, xml: String?, error: Error?) {
+    private func apiHandler(url: String, xml: String?, error: Error?, paymentType: String? = nil) {
         if url.contains(Urls.initPaymentUrl()) {
-            self.listener?.onPaymentInited(payment: xml?.getPayment(), error: error)
+            if paymentType == Params.APPLE_PAY {
+                let paymentId = xml?.getPaymentId()
+                
+                if paymentId != nil {
+                    self.listener?.onApplePayInited(paymentId: paymentId, error: error)
+                } else {
+                    let initError = Error(
+                        errorCode: 0,
+                        description: Params.PAYMENT_ERROR)
+                    self.listener?.onApplePayInited(paymentId: nil, error: initError)
+                }
+            } else {
+                self.listener?.onPaymentInited(payment: xml?.getPayment(), error: error)
+            }
         } else if url.contains(Urls.revokeUrl()) {
             self.listener?.onPaymentRevoked(payment: xml?.getPayment(), error: error)
         } else if url.contains(Urls.cancelUrl()) {
@@ -130,6 +162,8 @@ extension ApiHelper {
             self.listener?.onCardPayInited(payment: xml?.getPayment(), error: error)
         } else if url.contains(Urls.CARD + Urls.DIRECT) {
             self.listener?.onNonAcceptanceDirected(payment: xml?.getPayment(), error: error)
+        } else if url.contains(Urls.getCustomerUrl() + Urls.PAY_ROUTE) {
+            self.listener?.onPaymentInited(payment: xml?.getApplePayment(), error: error)
         }
     }
     
@@ -155,6 +189,63 @@ extension String {
             merchantId: self.getStringValue(key: Params.MERCHANT_ID),
             orderId: self.getStringValue(key: Params.ORDER_ID),
             redirectUrl: self.getStringValue(key: Params.REDIRECT_URL))
+    }
+    
+    func getPaymentId() -> String? {
+        let url = self.getPayment().redirectUrl
+        if url != nil {
+            let components = url!.components(separatedBy: "\(Params.PAYMENT_ID)=")
+            
+            if components.count > 1 {
+                return components[1]
+            }
+        }
+        
+        return nil
+    }
+    
+    func isApplePaymentSuccess() -> Bool {
+        let paymentData = try! JSONSerialization.jsonObject(with: Data(self.utf8), options: []) as? [String : Any]
+        let data = paymentData?[Params.TAG_DATA] as? [String: Any]
+        let status = data?[Params.TAG_STATUS] as! String
+        
+        return status == Params.STATUS_OK
+    }
+    
+    func getApplePayment() -> Payment {
+        let paymentData = try! JSONSerialization.jsonObject(with: Data(self.utf8), options: []) as? [String : Any]
+        let data = paymentData?[Params.TAG_DATA] as! [String: Any]
+        let status = data[Params.TAG_STATUS] as! String
+        let backUrl = data[Params.TAG_BACK_URL] as! [String: Any]
+        let url = backUrl[Params.TAG_URL] as! String
+        let params = backUrl[Params.TAG_PARAMS] as! [String: Any]
+        let orderId = params[Params.ORDER_ID] as! String
+        let paymentId = params[Params.PAYMENT_ID] as! Int
+        
+        return Payment(
+            status: status,
+            paymentId: paymentId,
+            merchantId: "",
+            orderId: orderId,
+            redirectUrl: url
+        )
+    }
+    
+    func getApplePaymentError() -> Error {
+        let paymentData = try! JSONSerialization.jsonObject(with: Data(self.utf8), options: []) as? [String : Any]
+        let data = paymentData?[Params.TAG_DATA] as? [String: Any]
+        let code = data?[Params.TAG_CODE] as? Int ?? 0
+        let message = data?[Params.TAG_MESSAGE] as? String ?? Params.PAYMENT_ERROR
+        
+        let unescapedMessageData = Data(
+            message
+                .replacingOccurrences(of: #"\U"#, with: #"\u"#)
+                .applyingTransform(.init("Hex-Any"), reverse: false)!
+                .utf8
+        )
+        let unescapedMessage = NSString(data: unescapedMessageData, encoding: NSUTF8StringEncoding)!
+        
+        return Error(errorCode: code, description: unescapedMessage as String)
     }
     
     func getRecurringPayment()-> RecurringPayment {

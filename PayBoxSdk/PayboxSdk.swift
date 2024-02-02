@@ -16,6 +16,7 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
     private var cardAdded: ((Payment?, Error?) -> Void)? = nil
     private var cardList: ((Array<Card>?, Error?)-> Void)? = nil
     private var cardPayInited: ((Payment?, Error?) -> Void)? = nil
+    private var applePaymentInited: ((String?, Error?) -> Void)? = nil
     
     public static func initialize(merchantId: Int, secretKey: String) -> PayboxSdkProtocol {
         return PayboxSdk(merchantId: merchantId, secretKey: secretKey)
@@ -28,6 +29,41 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
     }
     public func setPaymentView(paymentView: PaymentView) {
         self.paymentView = paymentView
+    }
+    
+    public func createApplePayment(amount: Float, description: String, orderId: String?, userId: String?, extraParams: [String : String]?, applePaymentInited: @escaping (String?, Error?) -> Void) {
+        self.applePaymentInited = applePaymentInited
+        var params = configs.getParams(extraParams: extraParams)
+        params[Params.AMOUNT] = "\(amount)"
+        params[Params.DESCRIPTION] = description
+        if !(orderId?.isEmpty ?? true) {
+            params[Params.ORDER_ID] = orderId!
+        }
+        if let userID = userId {
+            params[Params.USER_ID] = userID
+        }
+        apiHelper.initConnection(url: Urls.initPaymentUrl(), params: params, paymentType: Params.APPLE_PAY)
+    }
+    
+    public func confirmApplePayment(paymentId: String, tokenData: Data, paymentPaid: @escaping (Payment?, Error?) -> Void) {
+        self.paymentPaid = paymentPaid
+        
+        let paymentData = try! JSONSerialization.jsonObject(with: tokenData, options: []) as? [String : Any]
+        let header = paymentData?[Params.TAG_HEADER] as! [String: Any]
+        
+        var params = [String: String]()
+        params[Params.TAG_PAYMENT_DATA] = paymentData?[Params.TAG_DATA] as? String ?? ""
+        params[Params.TAG_PAYMENT_SIGNATURE] = paymentData?[Params.TAG_SIGNATURE] as? String ?? ""
+        params[Params.TAG_PAYMENT_ENCRYPTION] = paymentData?[Params.TAG_VERSION] as? String ?? ""
+        params[Params.TAG_PAYMENT_PUBLIC_KEY] = header[Params.TAG_PUBLICK_KEY] as? String ?? ""
+        params[Params.TAG_PAYMENT_PUBLIC_KEY_HASH] = header[Params.TAG_PUBLIC_KEY_HASH] as? String ?? ""
+        params[Params.TAG_PAYMENT_TRANSACTION_ID] = header[Params.TAG_TRANSACTION_ID] as? String ?? ""
+        
+        params[Params.TYPE] = Params.APPLE_PAY
+        params[Params.DOMAIN] = Params.SDK_DOMAIN
+        
+        let url = Urls.confirmApplePayUrl(paymentId: paymentId)
+        apiHelper.initConnection(url: url, params: params, paymentType: Params.APPLE_PAY)
     }
     
     public func createPayment(amount: Float, description: String, orderId: String?, userId: String?, extraParams: [String : String]?, paymentPaid: @escaping (Payment?, Error?) -> Void) {
@@ -179,7 +215,13 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
                     self.paymentPaid?(nil, Error(errorCode: 10, description: Params.PAYMENT_FAILURE))
                 }
             })
+        } else {
+            self.paymentPaid?(payment, error)
         }
+    }
+    
+    func onApplePayInited(paymentId: String?, error: Error?) {
+        self.applePaymentInited?(paymentId, error)
     }
     
     func onPaymentRevoked(payment: Payment?, error: Error?) {
