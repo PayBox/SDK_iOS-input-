@@ -259,8 +259,23 @@ PayBox SDK iOS - это библиотека позволяющая упрост
    import PassKit
 ```
 
+### 3. Добавьте проверку состояния Apple Pay на устройстве:
+``` Swift
+    func applePayStatus() -> (canMakePayments: Bool, canSetupCards: Bool) {
+        return (PKPaymentAuthorizationController.canMakePayments(),
+                PKPaymentAuthorizationController.canMakePayments(usingNetworks: supportedNetworks))
+    }
+```
 
-### 3. Добавьте метод который подготавливает данные для оплаты и отображает контроллер Apple Pay:
+### 4. Задайте список поддерживаемых МПС:
+``` Swift
+    let supportedNetworks: [PKPaymentNetwork] = [
+        .masterCard,
+        .visa
+    ]
+```
+
+### 5. Добавьте метод который подготавливает данные для оплаты и отображает контроллер Apple Pay:
 ``` Swift
     @objc func initApplePay(_: AnyObject) {
         // Товары в корзине
@@ -294,7 +309,7 @@ PayBox SDK iOS - это библиотека позволяющая упрост
     }
 ```
 
-### 4. Добавьте метод для инициализации и подтверждения платежа с помощью SDK:
+### 6. Добавьте метод для инициализации и подтверждения платежа с помощью SDK:
 
 ``` Swift
 func finishApplePayPayment(tokenData: Data, handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {
@@ -323,7 +338,7 @@ func finishApplePayPayment(tokenData: Data, handler completion: @escaping (PKPay
     }
 ```
 
-### 5. Добавьте кнопку Apple Pay на ваш экран
+### 7. Добавьте кнопку Apple Pay на ваш экран
 
 Создаем непосредственно саму кнопку:
 ``` Swift
@@ -347,7 +362,7 @@ func finishApplePayPayment(tokenData: Data, handler completion: @escaping (PKPay
    self.view.addSubview(applePayButton)
 ```
 
-Прописываем кнострейенты:
+Задаем положение кнопки на экране:
 ``` Swift
    NSLayoutConstraint.activate([
         applePayButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -362,12 +377,18 @@ func finishApplePayPayment(tokenData: Data, handler completion: @escaping (PKPay
    applePayButton.addTarget(self, action: #selector(self.initApplePay(_:)), for: .touchUpInside)
 ```
 
-### 6. Наследуйте делегат `PKPaymentAuthorizationControllerDelegate`:
+Для корректной работы необходимо убедиться что Apple Pay настроен на устойстве и управляем состоянием кнопки в зависимости от полученного статуса:
+``` Swift
+    let applePayStatus = applePayStatus()
+    applePayButton.isHidden = !applePayStatus.canMakePayments
+```
+
+### 8. Наследуйте делегат `PKPaymentAuthorizationControllerDelegate`:
 ``` Swift
    class ViewController: UIViewController, WebDelegate, PKPaymentAuthorizationControllerDelegate
 ```
 
-### 7. Имплементируйте методы делегата:
+### 9. Имплементируйте методы делегата:
 ``` Swift
    //Скрываем контроллер Apple Pay самостоятельно
    func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
