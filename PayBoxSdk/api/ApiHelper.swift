@@ -193,12 +193,18 @@ extension String {
     
     func getPaymentId() -> String? {
         let url = self.getPayment().redirectUrl
-        if url != nil {
-            let components = url!.components(separatedBy: "\(Params.PAYMENT_ID)=")
-            
-            if components.count > 1 {
-                return components[1]
-            }
+        var components = [""]
+        
+        if url?.contains("\(Params.PAYMENT_ID)=") == true {
+            components = url!.components(separatedBy: "\(Params.PAYMENT_ID)=")
+        }
+        
+        if url?.contains("\(Params.CUSTOMER)=") == true {
+            components = url!.components(separatedBy: "\(Params.CUSTOMER)=")
+        }
+        
+        if components.count > 1 {
+            return components[1].components(separatedBy: "&")[0]
         }
         
         return nil

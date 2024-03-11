@@ -164,6 +164,7 @@ class Params {
     static let RECURRING_PROFILE = "pg_recurring_profile"
     static let AMOUNT = "pg_amount"
     static let PAYMENT_ID = "pg_payment_id"
+    static let CUSTOMER = "customer"
     static let TIMEOUT_AFTER_PAYMENT = "pg_timeout_after_payment"
     static let PAYMMENT_ROUTE = "pg_payment_route"
     static let APPLE_PAY = "apple_pay"
