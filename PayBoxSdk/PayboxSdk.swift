@@ -48,7 +48,11 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
     public func confirmApplePayment(paymentId: String, tokenData: Data, paymentPaid: @escaping (Payment?, Error?) -> Void) {
         self.paymentPaid = paymentPaid
         
-        let paymentData = try! JSONSerialization.jsonObject(with: tokenData, options: []) as? [String : Any]
+        guard let paymentData = try? JSONSerialization.jsonObject(with: tokenData, options: []) as? [String : Any] else {
+            self.paymentPaid?(nil, Error.init(errorCode: 0, description: Params.FORMAT_ERROR))
+            return
+        }
+        
         let header = paymentData?[Params.TAG_HEADER] as! [String: Any]
         
         var params = [String: String]()
