@@ -317,21 +317,27 @@ func finishApplePayPayment(tokenData: Data, handler completion: @escaping (PKPay
         let description = "some description"
         let orderId = "1234"
         let userId = "1234"
-        
+
         sdk.createApplePayment(amount: amount, description: description, orderId: orderId, userId: userId, extraParams: nil) {
                     paymentId, error in {
-                        self.sdk.confirmApplePayment(paymentId: paymentId ?? "", tokenData: tokenData) {
-                            confirmPayment, confirmError in {
-                                if let directError = confirmError {
-                                    completion(PKPaymentAuthorizationResult(status: .failure, errors: nil))
-                                
-                                    // Ошибка платежа
-                                } else if let directPay = confirmPayment {
-                                    completion(PKPaymentAuthorizationResult(status: .success, errors: nil))
-                                    
-                                    // Успешный платеж
-                                }
-                            }()
+                        if let createError = error {
+                            completion(PKPaymentAuthorizationResult(status: .failure, errors: nil))
+                            
+                            // Ошибка инициализации платежа
+                        } else if let paymentId = paymentId {
+                            self.sdk.confirmApplePayment(paymentId: paymentId, tokenData: tokenData) {
+                                confirmPayment, confirmError in {
+                                    if let confirmError = confirmError {
+                                        completion(PKPaymentAuthorizationResult(status: .failure, errors: nil))
+                                        
+                                        // Ошибка платежа
+                                    } else if let confirmPayment = confirmPayment {
+                                        completion(PKPaymentAuthorizationResult(status: .success, errors: nil))
+                                        
+                                        // Успешный платеж
+                                    }
+                                }()
+                            }
                         }
                     }()
             }
