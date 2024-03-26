@@ -17,6 +17,7 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
     private var cardList: ((Array<Card>?, Error?)-> Void)? = nil
     private var cardPayInited: ((Payment?, Error?) -> Void)? = nil
     private var applePaymentInited: ((String?, Error?) -> Void)? = nil
+    private var applePaymentPaid: ((Payment?, Error?) -> Void)? = nil
     
     public static func initialize(merchantId: Int, secretKey: String) -> PayboxSdkProtocol {
         return PayboxSdk(merchantId: merchantId, secretKey: secretKey)
@@ -46,10 +47,10 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
     }
     
     public func confirmApplePayment(paymentId: String, tokenData: Data, paymentPaid: @escaping (Payment?, Error?) -> Void) {
-        self.paymentPaid = paymentPaid
+        self.applePaymentPaid = paymentPaid
         
         guard let paymentData = try? JSONSerialization.jsonObject(with: tokenData, options: []) as? [String : Any] else {
-            self.paymentPaid?(nil, Error.init(errorCode: 0, description: Params.FORMAT_ERROR))
+            self.applePaymentPaid?(nil, Error.init(errorCode: 0, description: Params.FORMAT_ERROR))
             return
         }
         
@@ -226,6 +227,10 @@ public class PayboxSdk: SignHelper, PayboxSdkProtocol, ApiProtocol  {
     
     func onApplePayInited(paymentId: String?, error: Error?) {
         self.applePaymentInited?(paymentId, error)
+    }
+    
+    func onApplePayPaid(payment: Payment?, error: Error?) {
+        self.applePaymentPaid?(payment, error)
     }
     
     func onPaymentRevoked(payment: Payment?, error: Error?) {
