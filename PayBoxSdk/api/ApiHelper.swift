@@ -163,7 +163,7 @@ extension ApiHelper {
         } else if url.contains(Urls.CARD + Urls.DIRECT) {
             self.listener?.onNonAcceptanceDirected(payment: xml?.getPayment(), error: error)
         } else if url.contains(Urls.getCustomerUrl() + Urls.PAY_ROUTE) {
-            self.listener?.onPaymentInited(payment: xml?.getApplePayment(), error: error)
+            self.listener?.onApplePayPaid(payment: xml?.getApplePayment(), error: error)
         }
     }
     
