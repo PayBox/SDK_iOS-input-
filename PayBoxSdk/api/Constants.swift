@@ -5,9 +5,11 @@ class Urls {
     static let DEFAULT_FREEDOM_URL = "https://api.freedompay.kz/"
     static let RU_PAYBOX_URL = "https://api.paybox.ru/"
     static let UZ_FREEDOM_URL = "https://api.freedompay.uz/"
+    static let KG_FREEDOM_URL = "https://api.freedompay.kg/"
     static let CUSTOMER_DEFAULT_URL = "https://customer.freedompay.kz"
     static let CUSTOMER_RU_URL = "https://customer.paybox.ru"
     static let CUSTOMER_UZ_URL = "https://customer.freedompay.uz"
+    static let CUSTOMER_KG_URL = "https://customer.freedompay.kg"
     static let CARDSTORAGE = "/cardstorage/"
     static let CARD = "/card/"
     static let PAY_ROUTE = "/pay/"
@@ -28,6 +30,8 @@ class Urls {
             return RU_PAYBOX_URL
         case .UZ:
             return UZ_FREEDOM_URL
+        case .KG:
+            return KG_FREEDOM_URL
         }
     }
     
@@ -39,6 +43,8 @@ class Urls {
             return CUSTOMER_RU_URL
         case .UZ:
             return CUSTOMER_UZ_URL
+        case .KG:
+            return CUSTOMER_KG_URL
         }
     }
     
@@ -51,6 +57,8 @@ class Urls {
             domain = CUSTOMER_RU_URL
         case .UZ:
             domain = CUSTOMER_UZ_URL
+        case .KG:
+            domain = CUSTOMER_KG_URL
         }
         
         domain = domain.replacingOccurrences(of: "https://", with: "")

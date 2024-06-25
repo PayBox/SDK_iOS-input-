@@ -73,6 +73,7 @@ public enum Region: String {
     case DEFAULT
     case RU
     case UZ
+    case KG
 }
 
 public enum PaymentSystem: String {
